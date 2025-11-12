@@ -1,7 +1,9 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/">Domov</router-link> |
+    <router-link to="/o-nas">O nás</router-link> |
+    <router-link to="/restauracia/menu">Reštaurácia</router-link> |
+    <router-link to="/admin/login">Admin</router-link>
   </nav>
   <router-view />
 </template>

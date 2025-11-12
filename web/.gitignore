@@ -21,3 +21,31 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Build directories
+build/
+.cache/
+dist-ssr/
+
+# Backup and temporary files
+*.tmp
+*.bak
+*.old
+
+# Environment files
+.env
+.env.production
+.env.development
+.env.test
+
+# Composer / PHP vendor
+vendor/
+composer.lock
+
+# System files
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
