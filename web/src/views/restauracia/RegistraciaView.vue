@@ -3,12 +3,10 @@
     <h1>Reštaurácia – Registrácia</h1>
     <p>Vzorová stránka pre registráciu.</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "RestauraciaRegistraciaView",
+  name: 'RestauraciaRegistraciaView',
 };
 </script>
-

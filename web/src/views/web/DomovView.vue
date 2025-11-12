@@ -3,12 +3,10 @@
     <h1>Domov</h1>
     <p>Vzorová stránka domov.</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "WebDomovView",
+  name: 'WebDomovView',
 };
 </script>
-

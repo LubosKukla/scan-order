@@ -3,12 +3,10 @@
     <h1>Kontakt</h1>
     <p>Vzorová stránka kontakt.</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "WebKontaktView",
+  name: 'WebKontaktView',
 };
 </script>
-

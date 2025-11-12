@@ -3,12 +3,10 @@
     <h1>Admin – Prehľad</h1>
     <p>Vzorová stránka pre dashboard/prehľad.</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "AdminPrehladView",
+  name: 'AdminPrehladView',
 };
 </script>
-

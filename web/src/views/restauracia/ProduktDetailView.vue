@@ -3,12 +3,11 @@
     <h1>Detail produktu</h1>
     <p>Vzorová stránka detailu produktu. ID: {{ $route.params.id }}</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "RestauraciaProduktDetailView",
+  name: 'RestauraciaProduktDetailView',
   props: {
     id: {
       type: String,
@@ -17,4 +16,3 @@ export default {
   },
 };
 </script>
-

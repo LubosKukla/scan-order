@@ -3,12 +3,10 @@
     <h1>Admin – Správa menu</h1>
     <p>Vzorová stránka pre správu menu.</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "AdminSpravaMenuView",
+  name: 'AdminSpravaMenuView',
 };
 </script>
-

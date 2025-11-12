@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #00adb5;
+  --color-surface: #393e46; /* dark gray */
+  --color-deep: #222831; /* darker background */
+  --color-ink: #eeeeee; /* light text / light surface */
+  --color-danger: #d53c3c; /* red */
+  --color-white: #ffffff; /* white */
+
+  --color-brand: var(--color-primary);
+}
+
+body {
+  @apply bg-ink;
+}

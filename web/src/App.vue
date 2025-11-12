@@ -1,32 +1,29 @@
 <template>
-  <nav>
-    <router-link to="/">Domov</router-link> |
-    <router-link to="/o-nas">O nás</router-link> |
-    <router-link to="/restauracia/menu">Reštaurácia</router-link> |
-    <router-link to="/admin/login">Admin</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <WebHeader v-if="isWebSection" />
+    <router-view />
+  </div>
 </template>
+
+<script>
+import WebHeader from './components/layout/header/WebHeader.vue';
+
+export default {
+  name: 'AppRoot',
+  components: { WebHeader },
+  computed: {
+    isWebSection() {
+      return this.$route.matched.some((r) => r.meta && r.meta.section === 'web');
+    },
+  },
+};
+</script>
 
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
 }
 </style>

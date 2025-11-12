@@ -3,12 +3,10 @@
     <h1>Admin – Zmena zabudnutého hesla</h1>
     <p>Vzorová stránka pre zmenu zabudnutého hesla administrátora.</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "AdminZmenaZabudnutehoHeslaView",
+  name: 'AdminZmenaZabudnutehoHeslaView',
 };
 </script>
-

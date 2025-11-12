@@ -3,12 +3,10 @@
     <h1>Admin – Prihlásenie</h1>
     <p>Vzorová stránka pre prihlásenie do administrácie.</p>
   </section>
-  
 </template>
 
 <script>
 export default {
-  name: "AdminLoginView",
+  name: 'AdminLoginView',
 };
 </script>
-
