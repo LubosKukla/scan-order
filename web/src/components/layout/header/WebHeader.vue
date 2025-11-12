@@ -4,7 +4,7 @@
       <div class="flex h-16 items-center gap-3">
         <!-- Brand -->
         <router-link to="/" class="items-center gap-3 flex-1" aria-label="Domov">
-          <img src="@/assets/img/scan-order-logo.png" alt="EasyOrder logo" class="w-40 select-none h-auto" />
+          <img src="@/assets/img/logo-scan-order.svg" alt="ScanOrder logo" class="w-40 select-none h-auto" />
         </router-link>
 
         <!-- Desktop nav -->
@@ -37,17 +37,18 @@
         </div>
 
         <!-- Mobile toggles -->
-        <button
-          class="ml-auto cursor-pointer inline-flex items-center justify-center rounded-md p-2 text-ink ring-1 ring-ink/30 md:hidden"
-          @click="mobileOpen = !mobileOpen" aria-label="Menu">
-          <svg v-if="!mobileOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current">
-            <path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" />
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current">
-            <path d="M5.3 6.3 6.7 5l12 12-1.4 1.3-12-12z" />
-            <path d="m18.7 6.3-1.4-1.3-12 12 1.4 1.3 12-12z" />
-          </svg>
-        </button>
+        <div @click="mobileOpen = !mobileOpen"
+          class="cursor-pointer flex-1 md:hidden inline-flex items-center justify-center">
+          <button class="ml-auto rounded-md p-2 text-ink ring-1 ring-ink/30" aria-label="Menu">
+            <svg v-if="!mobileOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current">
+              <path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" />
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current">
+              <path d="M5.3 6.3 6.7 5l12 12-1.4 1.3-12-12z" />
+              <path d="m18.7 6.3-1.4-1.3-12 12 1.4 1.3 12-12z" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
