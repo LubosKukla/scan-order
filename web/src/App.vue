@@ -4,7 +4,7 @@
     class="min-h-screen"
     :class="{ 'flex bg-deep text-ink': showAdminShell }"
   >
-    <AdminHeader v-if="showAdminShell" />
+    <NavBarAdmin v-if="showAdminShell" />
     <div
       class="flex-1 min-h-screen"
       :class="{ 'bg-surface text-ink flex flex-col': showAdminShell }"
@@ -20,12 +20,12 @@
 
 <script>
 import WebHeader from './components/layout/header/WebHeader.vue';
-import AdminHeader from './components/layout/header/AdminHeader.vue';
+import NavBarAdmin from './components/layout/header/NavBarAdmin.vue';
 import AdminFooter from './components/layout/footer/AdminFooter.vue';
 
 export default {
   name: 'AppRoot',
-  components: { WebHeader, AdminHeader, AdminFooter },
+  components: { WebHeader, NavBarAdmin, AdminFooter },
   computed: {
     isWebSection() {
       return this.$route.matched.some((r) => r.meta && r.meta.section === 'web');
