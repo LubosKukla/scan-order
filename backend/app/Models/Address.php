@@ -18,6 +18,11 @@ class Address extends Model
 
     public function customer()
     {
-        return $this->hasOne(Customer::class);
+        return $this->hasMany(Customer::class);
+    }
+
+    public function restaurant()
+    {
+        return $this->hasMany(Restaurant::class);
     }
 }

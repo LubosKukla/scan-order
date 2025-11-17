@@ -8,4 +8,34 @@ use Illuminate\Database\Eloquent\Model;
 class Restaurant extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'ico',
+        'dic',
+        'dic_dph',
+        'iban',
+        'is_active',
+        'name',
+        'name_boss',
+        'type_of_restaurant',
+        'description',
+        'logo_path',
+        'address_id',
+        'user_id',
+    ];
+
+    public function address()
+    {
+        return $this->belongsTo(Address::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function openHours()
+    {
+        return $this->hasMany(Open_Hour::class);
+    }
 }
