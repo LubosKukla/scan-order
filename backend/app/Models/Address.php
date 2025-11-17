@@ -16,12 +16,12 @@ class Address extends Model
         'city',
     ];
 
-    public function customer()
+    public function customers()
     {
         return $this->hasMany(Customer::class);
     }
 
-    public function restaurant()
+    public function restaurants()
     {
         return $this->hasMany(Restaurant::class);
     }

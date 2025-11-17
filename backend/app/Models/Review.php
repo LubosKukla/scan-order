@@ -5,26 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Item_variant extends Model
+class Review extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'menu_item_id',
-        'name',
-        'price',
-        'weight',
-        'kcal',
-        'is_active',
+        'customer_id',
+        'restaurant_id',
+        'type',
+        'text',
+        'rating',
     ];
 
     public function menuItem()
     {
         return $this->belongsTo(Menu_item::class);
     }
-
-    public function basketItems()
+    public function customer()
     {
-        return $this->hasMany(Basket_item::class);
+        return $this->belongsTo(Customer::class);
+    }
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
     }
 }

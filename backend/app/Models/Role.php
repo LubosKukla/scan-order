@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Alergen extends Model
+class Role extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'role_name',
     ];
 
-    public function menuItemAlergens()
+    public function workers()
     {
-        return $this->hasMany(menu_item_alergen::class);
+        return $this->hasMany(Worker::class);
     }
 }

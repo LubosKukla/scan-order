@@ -30,4 +30,9 @@ class Customer extends Model
     {
         return $this->hasMany(Basket::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

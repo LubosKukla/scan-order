@@ -5,30 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Basket extends Model
+class Worker extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'customer_id',
         'restaurant_id',
-        'status',
-        'subtotal',
-        'total',
+        'role_id',
+        'name',
+        'email',
+        'is_active',
     ];
 
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);
     }
-
-    public function customer()
+    public function role()
     {
-        return $this->belongsTo(Customer::class);
-    }
-
-    public function basketItems()
-    {
-        return $this->hasMany(Basket_item::class);
+        return $this->belongsTo(Role::class);
     }
 }

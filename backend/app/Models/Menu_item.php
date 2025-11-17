@@ -27,13 +27,22 @@ class Menu_item extends Model
         return $this->belongsTo(Restaurant::class);
     }
 
-    public function itemVariant()
+    public function itemVariants()
     {
         return $this->hasMany(Item_variant::class);
     }
 
-    public function menuItemAlergen()
+    public function menuItemAlergens()
     {
         return $this->hasMany(menu_item_alergen::class);
+    }
+
+    public function basketItems()
+    {
+        return $this->hasMany(Basket_item::class);
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }
