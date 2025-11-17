@@ -64,7 +64,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 export default {
-  name: 'AdminHeader',
+  name: 'NavBarAdmin',
   components: { FontAwesomeIcon },
   data() {
     return {
