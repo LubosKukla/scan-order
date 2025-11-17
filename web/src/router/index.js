@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-// Helper auth/role checks (nahraďte vlastnou logikou)
-function isAdmin() {
-  try {
-    const role = localStorage.getItem('role');
-    return role === 'admin';
-  } catch (e) {
-    return false;
-  }
-}
+// Helper auth/role checks
+// function isAdmin() {
+//   try {
+//     const role = localStorage.getItem('role');
+//     return role === 'admin';
+//   } catch (e) {
+//     return false;
+//   }
+// }
 
 const routes = [
   // Klasický web (root)
@@ -206,12 +206,13 @@ const router = createRouter({
 
 // Guard: admin sekcia len pre admina, ostatné pre všetkých
 router.beforeEach((to, from, next) => {
-  const roleRequired = to.matched.find((r) => r.meta && r.meta.requiresRole)?.meta.requiresRole;
-  if (roleRequired === 'admin') {
-    if (!isAdmin()) {
-      return next({ name: 'admin-login', query: { redirect: to.fullPath } });
-    }
-  }
+  // const roleRequired = to.matched.find((r) => r.meta && r.meta.requiresRole)?.meta.requiresRole;
+  // if (roleRequired === 'admin') {
+  //   //odkomentujem ked bude ready logins
+  //   // if (!isAdmin()) {
+  //   //   return next({ name: 'admin-login', query: { redirect: to.fullPath } });
+  //   // }
+  // }
   return next();
 });
 
