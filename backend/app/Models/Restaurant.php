@@ -38,4 +38,9 @@ class Restaurant extends Model
     {
         return $this->hasMany(Open_Hour::class);
     }
+
+    public function baskets()
+    {
+        return $this->hasMany(Basket::class);
+    }
 }
