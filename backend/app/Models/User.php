@@ -53,4 +53,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Restaurant::class);
     }
+
+    public function isCustomer()
+    {
+        return $this->customer()->exists();
+    }
+
+    public function isRestaurant()
+    {
+        return $this->restaurants()->exists();
+    }
 }

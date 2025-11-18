@@ -22,3 +22,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Authenticated routes can be added here...
 });
+
+Route::group(['middleware' => ['auth:sanctum', 'customer']], function () {
+    // Customer-specific routes
+});
+
+Route::group(['middleware' => ['auth:sanctum', 'restaurant']], function () {
+    // Restaurant-specific routes
+});

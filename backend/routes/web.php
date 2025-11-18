@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::post('/register/customer', [AuthController::class, 'registerCustomer']);
+Route::post('/register/restaurant', [AuthController::class, 'registerRestaurant']);
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout']);
-Route::post('/register/customer', [AuthController::class, 'registerCustomer']);

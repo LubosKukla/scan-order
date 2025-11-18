@@ -24,12 +24,14 @@ class AuthController extends Controller
             'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'accept_gdpr' => ['required', 'accepted']
         ]);
 
         try {
             $user = User::create([
                 'email' => $credentials['email'],
                 'password' => Hash::make($credentials['password']),
+                'accept_gdpr' => $request->boolean('accept_gdpr'),
             ]);
 
             Customer::create([
@@ -37,10 +39,7 @@ class AuthController extends Controller
                 'name' => $credentials['name'],
                 'surname' => $credentials['surname'],
             ]);
-
-            DB::commit();
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['message' => 'Chyba pri registrácii používateľa'], 500);
         }
 
@@ -51,6 +50,11 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         return response()->json($user);
+    }
+
+    public function registerRestaurant(Request $request)
+    {
+        $request->validate([]);
     }
 
     public function login(Request $request)
