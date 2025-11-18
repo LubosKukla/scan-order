@@ -1,23 +1,18 @@
-<template>
-  <div
-    id="app"
-    class="min-h-screen"
-    :class="{ 'flex bg-deep text-ink': showAdminShell }"
-  >
-    <NavBarAdmin v-if="showAdminShell" />
-    <div class="flex-1 min-h-screen" :class="{ 'bg-surface text-ink flex flex-col': showAdminShell }">
-      <template v-if="showAdminShell">
+﻿<template>
+  <div id="app" class="min-h-screen" :class="{ 'flex bg-deep text-ink': showAdmin }">
+    <NavBarAdmin v-if="showAdmin" />
+    <div class="flex-1 min-h-screen" :class="{ 'bg-surface text-ink flex flex-col': showAdmin }">
+      <template v-if="showAdmin">
         <AdminHeaderPanel />
       </template>
       <template v-else>
         <WebHeader v-if="isWebSection" />
       </template>
-      <main :class="{ 'flex-1 px-6 py-8': showAdminShell }">
+      <main :class="{ 'flex-1 px-6 py-8': showAdmin }">
         <router-view />
       </main>
-      <AdminFooter v-if="showAdminShell" />
+      <AdminFooter v-if="showAdmin" />
     </div>
-    <AdminFooter v-if="showAdminFooter && !showAdminShell" />
   </div>
 </template>
 
@@ -29,16 +24,20 @@ import AdminFooter from './components/layout/footer/AdminFooter.vue';
 
 export default {
   name: 'AppRoot',
-  components: { WebHeader, NavBarAdmin, AdminHeaderPanel, AdminFooter },
+  components: {
+    WebHeader,
+    NavBarAdmin,
+    AdminHeaderPanel,
+    AdminFooter,
+  },
   computed: {
     isWebSection() {
-      return this.$route.matched.some((r) => r.meta && r.meta.section === 'web');
+      const matched = this.$route?.matched || [];
+      return matched.some((r) => r.meta && r.meta.section === 'web');
     },
-    showAdminShell() {
-      return this.$route.matched.some((r) => r.meta && r.meta.requiresRole === 'admin');
-    },
-    showAdminFooter() {
-      return this.$route.matched.some((r) => r.meta && r.meta.section === 'admin');
+    showAdmin() {
+      const matched = this.$route?.matched || [];
+      return matched.some((r) => r.meta && r.meta.requiresRole === 'admin');
     },
   },
 };

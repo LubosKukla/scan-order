@@ -1,19 +1,18 @@
-<template>
+﻿<template>
   <header class="bg-white border-b border-surface/40 shadow-sm">
     <div class="flex flex-col gap-4 pl-6 pr-10 py-2 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-1 items-center gap-4 min-w-0">
         <h1 class="text-base font-semibold text-deep whitespace-nowrap">
           {{ currentTitle }}
         </h1>
-        <label class="relative flex-1 max-w-lg hidden md:block">
-          <font-awesome-icon :icon="faSearch" class="absolute left-4 top-1/2 -translate-y-1/2 text-deep/40" />
-          <input
+        <div class="flex-1 max-w-lg hidden md:block">
+          <BaseInput
             v-model="searchQuery"
             type="search"
             placeholder="Hľadať..."
-            class="w-full rounded-xl bg-ink py-2 pl-12 pr-4 text-sm text-deep placeholder:text-deep/60 focus:border-primary focus:ring-2 focus:ring-primary/40 outline-none transition"
+            :label="null"
           />
-        </label>
+        </div>
       </div>
 
       <div class="flex items-center justify-end gap-4">
@@ -74,20 +73,17 @@
 </template>
 
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBell, faSearch } from '@fortawesome/free-solid-svg-icons';
+import BaseInput from '../../global/inputs/BaseInput.vue';
 
 export default {
   name: 'AdminHeaderPanel',
-  components: { FontAwesomeIcon },
+  components: { BaseInput },
   data() {
     return {
       searchQuery: '',
       restaurantName: 'Reštaurácia u Jozefa',
       notificationCount: 3,
       showRestaurantDropdown: false,
-      faBell,
-      faSearch,
     };
   },
   computed: {
