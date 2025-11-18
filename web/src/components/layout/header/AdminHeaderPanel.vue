@@ -1,17 +1,12 @@
 ﻿<template>
-  <header class="bg-white border-b border-surface/40 shadow-sm">
+  <header class="bg-white border-b border-ink shadow-sm">
     <div class="flex flex-col gap-4 pl-6 pr-10 py-2 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-1 items-center gap-4 min-w-0">
         <h1 class="text-base font-semibold text-deep whitespace-nowrap">
           {{ currentTitle }}
         </h1>
         <div class="flex-1 max-w-lg hidden md:block">
-          <BaseInput
-            v-model="searchQuery"
-            type="search"
-            placeholder="Hľadať..."
-            :label="null"
-          />
+          <BaseInput v-model="searchQuery" type="search" placeholder="Hľadať..." :label="null" />
         </div>
       </div>
 

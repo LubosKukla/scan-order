@@ -1,9 +1,9 @@
 <template>
   <aside
-    class="bg-deep text-ink flex flex-col border-r border-white/10 shadow-xl shadow-black/20 transition-all duration-300 ease-in-out"
+    class="bg-deep text-ink flex flex-col border-r border-ink/10 shadow-xl shadow-black/20 transition-all duration-300 ease-in-out"
     :class="collapsed ? 'w-20' : 'w-64'"
   >
-    <div class="flex items-center gap-3 px-5 py-6 border-b border-white/5">
+    <div class="flex items-center gap-3 px-5 py-6 border-b border-ink/10">
       <div class="h-auto w-auto flex items-center justify-center rounded-2xl">
         <img src="@/assets/img/only-logo.svg" alt="Scan&Order logo" class="w-auto max-h-14 select-none" />
       </div>
@@ -39,7 +39,7 @@
 
     <button
       type="button"
-      class="mt-auto flex items-center justify-center border-t border-white/10 px-4 py-4 text-ink/70 transition-colors cursor-pointer duration-200 hover:text-white"
+      class="mt-auto flex items-center justify-center border-t border-ink/10 px-4 py-4 text-ink/70 transition-colors cursor-pointer duration-200 hover:text-white"
       @click="toggleCollapse"
       aria-label="Prepnut zobrazenie navigacie"
     >
