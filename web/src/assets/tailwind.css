@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 @theme {
   --color-primary: #00adb5;
@@ -13,4 +14,9 @@
 
 body {
   @apply bg-ink;
+  font-family: 'Open Sans', sans-serif;
+}
+
+:root {
+  font-family: 'Open Sans', sans-serif;
 }
