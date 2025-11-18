@@ -28,6 +28,7 @@ import {
   faDownload,
   faPaperPlane,
   faWandMagicSparkles,
+  faArrowRightToBracket,
 } from '@fortawesome/free-solid-svg-icons';
 
 const ICONS = {
@@ -38,6 +39,7 @@ const ICONS = {
   download: faDownload,
   send: faPaperPlane,
   generate: faWandMagicSparkles,
+  login: faArrowRightToBracket,
 };
 
 export default {
