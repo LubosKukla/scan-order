@@ -8,7 +8,11 @@
         <span class="hidden sm:inline text-deep/30">•</span>
         <a href="https://luboskukla.sk" target="_blank" rel="noopener noreferrer" class="transition-colors">
           Web by
-          <span class="underline underline-offset-4 hover:text-primary">Web K s.r.o.</span>
+          <span class="hover:underline hover:underline-offset-4 hover:text-primary">Web K</span>
+        </a>
+        &
+        <a href="https://jandrugda.site" target="_blank" rel="noopener noreferrer" class="transition-colors">
+          <span class="hover:underline hover:underline-offset-4 hover:text-primary">Ján D.</span>
         </a>
       </div>
     </div>
