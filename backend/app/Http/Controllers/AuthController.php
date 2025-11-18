@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\Fluent\Concerns\Has;
 use Illuminate\Validation\ValidationException;
@@ -22,8 +23,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-            'password_confirmation' => ['required', 'string', 'same:password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         try {
@@ -31,15 +31,20 @@ class AuthController extends Controller
                 'email' => $credentials['email'],
                 'password' => Hash::make($credentials['password']),
             ]);
+
+            Customer::create([
+                'user_id' => $user->id,
+                'name' => $credentials['name'],
+                'surname' => $credentials['surname'],
+            ]);
+
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['message' => 'Chyba pri registrácii používateľa'], 500);
         }
 
-        Customer::create([
-            'user_id' => $user->id,
-            'name' => $credentials['name'],
-            'surname' => $credentials['surname'],
-        ]);
+
 
 
         Auth::login($user);
