@@ -49,9 +49,9 @@ export default {
   computed: {
     trackClasses() {
       if (this.disabled) {
-        return this.modelValue ? 'bg-primary/60 opacity-60 ' : ' bg-surface/10 opacity-60';
+        return !this.modelValue ? 'bg-primary/60 opacity-60 ' : ' bg-surface/10 opacity-60';
       }
-      return this.modelValue ? 'bg-primary' : 'bg-surface/40';
+      return !this.modelValue ? 'bg-primary' : 'bg-surface/40';
     },
     ariaLabel() {
       return this.label || this.name || 'Prepínač';
