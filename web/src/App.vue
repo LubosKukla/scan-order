@@ -5,13 +5,18 @@
       <template v-if="showAdmin">
         <AdminHeaderPanel />
       </template>
-      <template v-else>
-        <WebHeader v-if="isWebSection" />
+      <template v-else-if="showInMore">
+        <WebHeader />
       </template>
       <main :class="{ 'flex-1 px-6 py-8': showAdmin }">
         <router-view />
       </main>
-      <AdminFooter v-if="showAdmin" />
+      <template v-if="showAdmin">
+        <AdminFooter />
+      </template>
+      <template v-else-if="showInMore">
+        <WebFooter />
+      </template>
     </div>
   </div>
   <SnackbarStack />
@@ -22,6 +27,7 @@ import WebHeader from './components/layout/header/WebHeader.vue';
 import NavBarAdmin from './components/layout/header/NavBarAdmin.vue';
 import AdminHeaderPanel from './components/layout/header/AdminHeaderPanel.vue';
 import AdminFooter from './components/layout/footer/AdminFooter.vue';
+import WebFooter from './components/layout/footer/WebFooter.vue';
 import SnackbarStack from './components/global/feedback/SnackbarStack.vue';
 
 export default {
@@ -31,16 +37,23 @@ export default {
     NavBarAdmin,
     AdminHeaderPanel,
     AdminFooter,
+    WebFooter,
     SnackbarStack,
   },
   computed: {
+    matchedRoutes() {
+      return this.$route?.matched || [];
+    },
     isWebSection() {
-      const matched = this.$route?.matched || [];
-      return matched.some((r) => r.meta && r.meta.section === 'web');
+      return this.matchedRoutes.some((r) => r.meta && r.meta.section === 'web');
     },
     showAdmin() {
-      const matched = this.$route?.matched || [];
-      return matched.some((r) => r.meta && r.meta.requiresRole === 'admin');
+      return this.matchedRoutes.some((r) => r.meta && r.meta.requiresRole === 'admin');
+    },
+    showInMore() {
+      if (this.showAdmin) return false;
+      const hasMore = this.matchedRoutes.some((r) => r.meta && r.meta.showInMore);
+      return this.isWebSection || hasMore;
     },
   },
 };

@@ -110,25 +110,25 @@ const routes = [
   {
     path: '/admin/login',
     name: 'admin-login',
-    meta: { section: 'admin', title: 'Prihlásenie' },
+    meta: { section: 'admin', title: 'Prihlásenie', showInMore: true },
     component: () => import('../views/admin/LoginView.vue'),
   },
   {
     path: '/admin/register',
     name: 'admin-register',
-    meta: { section: 'admin', title: 'Registrácia' },
+    meta: { section: 'admin', title: 'Registrácia', showInMore: true },
     component: () => import('../views/admin/RegisterView.vue'),
   },
   {
     path: '/admin/zabudnute-heslo',
     name: 'admin-zabudnute-heslo',
-    meta: { section: 'admin', title: 'Zabudnuté heslo' },
+    meta: { section: 'admin', title: 'Zabudnuté heslo', showInMore: true },
     component: () => import('../views/admin/ZabudnuteHesloView.vue'),
   },
   {
     path: '/admin/zmena-zabudnuteho-hesla',
     name: 'admin-zmena-zabudnuteho-hesla',
-    meta: { section: 'admin', title: 'Zmena hesla' },
+    meta: { section: 'admin', title: 'Zmena hesla', showInMore: true },
     component: () => import('../views/admin/ZmenaZabudnutehoHeslaView.vue'),
   },
   {
