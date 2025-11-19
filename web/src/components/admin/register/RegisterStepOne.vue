@@ -1,17 +1,20 @@
-﻿<template>
+<template>
   <form class="space-y-1" @submit.prevent="handleSubmit">
     <BaseInput
       id="restaurant-name"
       :modelValue="form.restaurantName"
       label="Názov reštaurácie"
       placeholder="Zadajte názov reštaurácie"
+      :required="true"
+      :error="errors.restaurantName"
       @update:modelValue="updateField('restaurantName', $event)"
     />
     <BaseInput
       id="owner"
       :modelValue="form.ownerName"
-      label="Meno majiteľa / zodpovednej osoby"
+      label="Meno majiteľa alebo kontaktnej osoby"
       placeholder="Zadajte celé meno"
+      :error="errors.ownerName"
       @update:modelValue="updateField('ownerName', $event)"
     />
     <BaseInput
@@ -20,6 +23,8 @@
       type="email"
       label="Email"
       placeholder="vas.email@priklad.sk"
+      :required="true"
+      :error="errors.email"
       @update:modelValue="updateField('email', $event)"
     />
     <BaseInput
@@ -28,6 +33,8 @@
       type="tel"
       label="Telefónne číslo"
       placeholder="+421 900 000 000"
+      :required="true"
+      :error="errors.phone"
       @update:modelValue="updateField('phone', $event)"
     />
     <BaseInput
@@ -36,6 +43,8 @@
       type="password"
       label="Heslo"
       placeholder="Vytvorte silné heslo"
+      :required="true"
+      :error="errors.password"
       @update:modelValue="updateField('password', $event)"
     />
     <BaseInput
@@ -44,13 +53,20 @@
       type="password"
       label="Potvrďte heslo"
       placeholder="Zopakujte heslo"
+      :required="true"
+      :error="errors.passwordConfirm"
       @update:modelValue="updateField('passwordConfirm', $event)"
     />
 
-    <BaseCheckbox :modelValue="form.acceptedTerms" class="my-4 mx-2" @update:modelValue="updateField('acceptedTerms', $event)">
+    <BaseCheckbox
+      :modelValue="form.acceptedTerms"
+      class="my-4 mx-2"
+      :error="errors.acceptedTerms"
+      @update:modelValue="updateField('acceptedTerms', $event)"
+    >
       Súhlasím s
-      <a href="#" class="font-semibold text-primary hover:text-primary/80 hover:underline">Obchodnými podmienkami</a>
-      a
+      <a href="#" class="font-semibold text-primary hover:text-primary/80 hover:underline">obchodnými podmienkami</a>
+      a s
       <a href="#" class="font-semibold text-primary hover:text-primary/80 hover:underline">GDPR</a>
     </BaseCheckbox>
 
@@ -71,6 +87,10 @@ export default {
       type: Object,
       required: true,
     },
+    errors: {
+      type: Object,
+      required: true,
+    },
   },
   emits: ['update-field', 'next'],
   methods: {
@@ -78,7 +98,6 @@ export default {
       this.$emit('update-field', { field, value });
     },
     handleSubmit() {
-      if (!this.form.acceptedTerms) return;
       this.$emit('next');
     },
   },

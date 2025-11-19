@@ -5,6 +5,8 @@
       :options="restaurantTypes"
       label="Typ reštaurácie"
       placeholder="Vyberte typ"
+      :required="true"
+      :error="errors.restaurantType"
       @update:modelValue="updateField('restaurantType', $event)"
     />
     <BaseSelect
@@ -12,6 +14,8 @@
       :options="cuisineTypes"
       label="Typ kuchyne"
       placeholder="Vyberte typ kuchyne"
+      :required="true"
+      :error="errors.cuisineType"
       @update:modelValue="updateField('cuisineType', $event)"
     />
 
@@ -21,6 +25,8 @@
         :modelValue="form.street"
         label="Ulica a číslo"
         placeholder="Hlavná 123"
+        :required="true"
+        :error="errors.street"
         @update:modelValue="updateField('street', $event)"
       />
       <div class="grid gap-4 md:grid-cols-2">
@@ -29,6 +35,8 @@
           :modelValue="form.city"
           label="Mesto"
           placeholder="Bratislava"
+          :required="true"
+          :error="errors.city"
           @update:modelValue="updateField('city', $event)"
         />
         <BaseInput
@@ -36,6 +44,8 @@
           :modelValue="form.zip"
           label="PSČ"
           placeholder="811 01"
+          :required="true"
+          :error="errors.zip"
           @update:modelValue="updateField('zip', $event)"
         />
       </div>
@@ -53,15 +63,15 @@
             :modelValue="form.openingHours[day.key].from"
             :label="null"
             placeholder="--:--"
-            @update:modelValue="updateOpening(day.key, 'from', $event)"
             class="max-w-xs"
+            @update:modelValue="updateOpening(day.key, 'from', $event)"
           />
           <BaseTimePicker
             :modelValue="form.openingHours[day.key].to"
             :label="null"
             placeholder="--:--"
-            @update:modelValue="updateOpening(day.key, 'to', $event)"
             class="max-w-xs"
+            @update:modelValue="updateOpening(day.key, 'to', $event)"
           />
         </div>
       </div>
@@ -108,6 +118,7 @@ export default {
     restaurantTypes: { type: Array, required: true },
     cuisineTypes: { type: Array, required: true },
     days: { type: Array, required: true },
+    errors: { type: Object, required: true },
   },
   emits: ['update-field', 'update-opening-hours', 'next', 'prev'],
   methods: {

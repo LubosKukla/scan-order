@@ -1,7 +1,8 @@
-﻿<template>
+<template>
   <div class="space-y-2 p-2" ref="dropdownRef">
-    <label v-if="label" :for="name || selectId" class="text-sm font-bold text-deep">
+    <label v-if="label" :for="name || selectId" class="text-sm font-bold text-deep flex items-center gap-1">
       {{ label }}
+      <span v-if="required" class="text-danger text-xs font-semibold">*</span>
     </label>
     <div class="relative">
       <input type="hidden" :name="name" :value="modelValue" />
@@ -12,7 +13,8 @@
         :aria-expanded="isOpen.toString()"
         :aria-labelledby="name || selectId"
         :disabled="disabled"
-        class="flex w-full items-center justify-between rounded-xl border border-surface/10 bg-ink px-4 py-2 text-left text-sm font-semibold text-deep placeholder:text-deep/60 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10 focus:outline-none transition disabled:cursor-not-allowed disabled:opacity-50"
+        :aria-invalid="hasError"
+        :class="[buttonClasses, hasError ? errorClasses : focusClasses]"
         v-bind="selectAttrs"
         @click="toggleDropdown"
         @keydown="onKeydown"
@@ -56,6 +58,7 @@
         </ul>
       </transition>
     </div>
+    <p v-if="hasError" class="text-xs font-semibold text-danger px-2">{{ error }}</p>
   </div>
 </template>
 
@@ -98,6 +101,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    error: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -119,6 +130,18 @@ export default {
     displayLabel() {
       const selected = this.options[this.selectedIndex];
       return selected ? this.optionLabel(selected) : '';
+    },
+    hasError() {
+      return Boolean(this.error);
+    },
+    buttonClasses() {
+      return 'flex w-full items-center justify-between rounded-xl border bg-ink px-4 py-2 text-left text-sm font-semibold text-deep placeholder:text-deep/60 transition disabled:cursor-not-allowed disabled:opacity-50';
+    },
+    focusClasses() {
+      return 'border-surface/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/10 focus:border-primary focus:bg-white';
+    },
+    errorClasses() {
+      return 'border-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/15 focus:border-danger focus:bg-white';
     },
   },
   mounted() {

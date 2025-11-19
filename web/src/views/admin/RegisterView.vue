@@ -37,11 +37,11 @@
         </p>
       </div>
 
-      <RegisterStepOne v-if="step === 1" :form="form" @update-field="updateField" @next="nextStep" />
-
+      <RegisterStepOne v-if="step === 1" :form="form" :errors="errors" @update-field="updateField" @next="nextStep" />
       <RegisterStepTwo
         v-else-if="step === 2"
         :form="form"
+        :errors="errors"
         :restaurant-types="restaurantTypes"
         :cuisine-types="cuisineTypes"
         :days="days"
@@ -50,10 +50,10 @@
         @prev="goToStep(1)"
         @next="nextStep"
       />
-
       <RegisterStepThree
         v-else
         :form="form"
+        :errors="errors"
         :plans="plans"
         @update-field="updateField"
         @prev="goToStep(2)"
@@ -85,6 +85,9 @@ import RegisterStepTwo from '../../components/admin/register/RegisterStepTwo.vue
 import RegisterStepThree from '../../components/admin/register/RegisterStepThree.vue';
 import { useSnackbar } from '../../composables/useSnackbar';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\+?\d{8,14}$/;
+const ZIP_REGEX = /^\d{3}\s?\d{2}$/;
 const snackbar = useSnackbar();
 
 export default {
@@ -109,8 +112,24 @@ export default {
         openingHours: this.createOpeningHours(),
         description: '',
         logo: null,
-        selectedPlan: 'menu',
+        selectedPlan: '',
         tables: '',
+      },
+      errors: {
+        restaurantName: '',
+        ownerName: '',
+        email: '',
+        phone: '',
+        password: '',
+        passwordConfirm: '',
+        acceptedTerms: '',
+        restaurantType: '',
+        cuisineType: '',
+        street: '',
+        city: '',
+        zip: '',
+        tables: '',
+        selectedPlan: '',
       },
       restaurantTypes: ['Reštaurácia', 'Bistro', 'Kaviareň', 'Bar'],
       cuisineTypes: ['Európska', 'Ázijská', 'Talianska', 'Mexická'],
@@ -121,7 +140,7 @@ export default {
         { key: 'thursday', label: 'Štvrtok' },
         { key: 'friday', label: 'Piatok' },
         { key: 'saturday', label: 'Sobota' },
-        { key: 'sunday', label: 'Nedeľa' },
+        { key: 'sunday', label: 'Nedela' },
       ],
       plans: [
         { id: 'menu', name: 'Menu', label: 'Základné', price: '8,46 €' },
@@ -156,15 +175,97 @@ export default {
       };
     },
     updateField({ field, value }) {
-      if (field in this.form) {
-        this.form[field] = value;
+      if (!(field in this.form)) return;
+      this.form[field] = value;
+      this.revalidateField(field);
+      if (field === 'password' || field === 'passwordConfirm') {
+        this.revalidateField('passwordConfirm');
       }
     },
     updateOpeningHours({ day, key, value }) {
-      this.form.openingHours[day][key] = value;
+      if (this.form.openingHours[day]) {
+        this.form.openingHours[day][key] = value;
+      }
+    },
+    revalidateField(field) {
+      if (!(field in this.errors)) return;
+      this.errors[field] = this.getFieldError(field);
+    },
+    getFieldError(field) {
+      const value = this.form[field];
+      const normalized = value === null || value === undefined ? '' : String(value).trim();
+      switch (field) {
+        case 'restaurantName':
+          return normalized ? '' : 'Toto pole je povinné.';
+        case 'email':
+          if (!normalized) return 'Email je povinný.';
+          return EMAIL_REGEX.test(normalized) ? '' : 'Zadajte platný email.';
+        case 'phone':
+          if (!normalized) return 'Telefón je povinný.';
+          return PHONE_REGEX.test(normalized.replace(/\s+/g, ''))
+            ? ''
+            : 'Telefón musí obsahovať 8 až 14 číslic (môže mať medzery a znak + na začiatku).';
+        case 'password':
+          if (!normalized) return 'Heslo je povinné.';
+          if (normalized.length < 8) return 'Heslo musí mať aspoň 8 znakov.';
+          return '';
+        case 'passwordConfirm':
+          if (!normalized) return 'Potvrdenie hesla je povinné.';
+          if (value !== this.form.password) return 'Heslá sa musia zhodovať.';
+          return '';
+        case 'restaurantType':
+        case 'cuisineType':
+        case 'street':
+        case 'city':
+          return normalized ? '' : 'Toto pole je povinné.';
+        case 'zip':
+          if (!normalized) return 'PSČ je povinné.';
+          return ZIP_REGEX.test(normalized) ? '' : 'Zadajte platné PSČ.';
+        case 'acceptedTerms':
+          return this.form.acceptedTerms ? '' : 'Je potrebné súhlasiť s podmienkami.';
+        case 'selectedPlan':
+          return this.form.selectedPlan ? '' : 'Vyberte plán.';
+        case 'tables':
+          if (!normalized) return '';
+          return Number(value) >= 0 ? '' : 'Zadajte kladné číslo.';
+        default:
+          return '';
+      }
+    },
+    validateFields(fields) {
+      let valid = true;
+      fields.forEach((field) => {
+        const message = this.getFieldError(field);
+        this.errors[field] = message;
+        if (message) valid = false;
+      });
+      return valid;
+    },
+    validateStepOne() {
+      return this.validateFields(['restaurantName', 'email', 'phone', 'password', 'passwordConfirm', 'acceptedTerms']);
+    },
+    validateStepTwo() {
+      return this.validateFields(['restaurantType', 'cuisineType', 'street', 'city', 'zip']);
+    },
+    validateStepThree() {
+      return this.validateFields(['selectedPlan']);
+    },
+    notifyErrors(message) {
+      snackbar.notify({
+        message,
+        variant: 'danger',
+      });
     },
     nextStep() {
-      if (this.step === 1 && !this.form.acceptedTerms) return;
+      let valid = true;
+      if (this.step === 1) valid = this.validateStepOne();
+      else if (this.step === 2) valid = this.validateStepTwo();
+
+      if (!valid) {
+        this.notifyErrors('Vyplňte prosím povinné údaje.');
+        return;
+      }
+
       if (this.step < 3) this.step += 1;
     },
     goToStep(stepNumber) {
@@ -174,8 +275,14 @@ export default {
       }
     },
     finishRegistration() {
+      if (!this.validateStepThree()) {
+        this.notifyErrors('Vyberte si plán, aby ste mohli pokračovať.');
+        return;
+      }
+
       snackbar.notify({
-        message: 'Boli ste úspešne registrovaný',
+        message: 'Registrácia bola úspešná.',
+        variant: 'success',
       });
       this.$emit('register-submit', { ...this.form });
     },

@@ -2,22 +2,22 @@
   <form class="space-y-4" @submit.prevent="handleSubmit">
     <p class="text-base font-bold text-deep">Vyberte cenový plán</p>
     <div class="rounded-3xl border border-primary/20 bg-primary/5 px-6 py-4 text-sm text-deep">
-      <p class="font-semibold text-lg mb-2">🎉 Skúšobné obdobie zadarmo!</p>
+      <p class="font-semibold text-lg mb-2">Skúšobné obdobie zadarmo</p>
       <p>
-        Po registrácii získate
-        <strong>3 mesiace úplne zadarmo</strong>
+        Po registracii ziskate
+        <strong>3 mesiace bez poplatku</strong>
         so všetkými výhodami zvoleného plánu.
       </p>
       <p>Platba nie je potrebná hneď pri registrácii.</p>
     </div>
 
-    <div class="space-y-4">
+    <div class="space-y-2">
       <div class="grid gap-4 md:grid-cols-4">
         <button
           v-for="plan in plans"
           :key="plan.id"
           type="button"
-          class="rounded-2xl border px-4 py-5 text-center transition cursor-pointer"
+          class="rounded-2xl border px-4 py-5 text-center transition cursor-pointer focus:outline-none"
           :class="planButtonClass(plan.id)"
           @click="selectPlan(plan.id)"
         >
@@ -28,6 +28,7 @@
           <p class="text-xs text-deep/60">/ mesiac</p>
         </button>
       </div>
+      <p v-if="errors.selectedPlan" class="text-xs font-semibold text-danger px-2">{{ errors.selectedPlan }}</p>
     </div>
 
     <div class="space-y-1">
@@ -37,15 +38,16 @@
         type="number"
         label="Počet stolov (orientačne)"
         placeholder="Zadajte približný počet stolov"
+        :error="errors.tables"
         @update:modelValue="updateField('tables', $event)"
       />
-      <p class="text-xs text-deep/60 px-2">Tento údaj je len orientačný a môžete ho neskôr zmeniť v nastaveniach.</p>
+      <p class="text-xs text-deep/60 px-2">Údaje môžete neskôr upraviť v nastaveniach.</p>
     </div>
 
     <div
       class="rounded-2xl border border-deep/10 bg-ink/40 px-4 py-3 text-sm text-deep flex items-center gap-3 mt-8 mb-14"
     >
-      <span class="text-primary">💳</span>
+      <span class="text-primary text-xl">💳</span>
       <div>
         <p class="font-semibold">Spôsob platby: Stripe</p>
         <p class="text-xs text-deep/60">Bezpečná platobná brána pre online platby</p>
@@ -71,6 +73,7 @@ export default {
   props: {
     form: { type: Object, required: true },
     plans: { type: Array, required: true },
+    errors: { type: Object, required: true },
   },
   emits: ['update-field', 'prev', 'finish'],
   methods: {
@@ -81,8 +84,12 @@ export default {
       this.updateField('selectedPlan', id);
     },
     planButtonClass(id) {
-      return this.form.selectedPlan === id
-        ? 'border-primary bg-primary/5 text-primary shadow-[0_6px_16px_rgba(15,160,170,0.15)]'
+      const isSelected = this.form.selectedPlan === id;
+      if (isSelected) {
+        return 'border-primary bg-primary/5 text-primary shadow-[0_6px_16px_rgba(15,160,170,0.15)]';
+      }
+      return this.errors.selectedPlan
+        ? 'border-danger/40 bg-white hover:border-danger'
         : 'border-ink/10 bg-white hover:border-primary/40';
     },
     handleSubmit() {

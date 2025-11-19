@@ -17,7 +17,7 @@
           @mouseenter="handleMouseEnter(snackbar.id)"
           @mouseleave="handleMouseLeave"
         >
-          <span class="snackbar-icon inline-flex h-7 w-7 items-center justify-center rounded-full bg-deep text-white">
+          <span class="snackbar-icon inline-flex h-7 w-7 items-center justify-center rounded-full" :class="iconClass(snackbar.variant)">
             <font-awesome-icon :icon="iconFor(snackbar.variant, snackbar.icon)" class="text-white" />
           </span>
           <p class="snackbar-message text-sm font-semibold text-deep">
@@ -54,6 +54,13 @@ export default {
     const orderedSnackbars = computed(() => [...snackbars].reverse());
     const hoveredId = ref(null);
     const hoverTimeout = ref(null);
+    const variantIconClasses = {
+      danger: 'bg-danger text-white',
+      success: 'bg-primary text-white',
+      info: 'bg-info text-white',
+      warning: 'bg-warning text-white',
+      default: 'bg-deep text-white',
+    };
 
     const itemStyle = (snackbarId, index, total) => {
       const hoveringAny = hoveredId.value !== null;
@@ -131,6 +138,13 @@ export default {
       return ICON_MAP.default;
     };
 
+    const iconClass = (variant) => {
+      if (variant && variantIconClasses[variant]) {
+        return variantIconClasses[variant];
+      }
+      return variantIconClasses.default;
+    };
+
     return {
       orderedSnackbars,
       handleClick,
@@ -138,6 +152,7 @@ export default {
       handleMouseLeave,
       itemStyle,
       iconFor,
+      iconClass,
     };
   },
 };
