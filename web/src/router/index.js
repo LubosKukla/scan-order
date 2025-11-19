@@ -132,6 +132,12 @@ const routes = [
     component: () => import('../views/admin/ZmenaZabudnutehoHeslaView.vue'),
   },
   {
+    path: '/admin/zmena-zabudnuteho-hesla-po-emaili',
+    name: 'admin-zmena-zabudnuteho-hesla-po-emaili',
+    meta: { section: 'admin', title: 'Nastavenie nového hesla' },
+    component: () => import('../views/admin/ZmenaZabudnutehoHeslaPoEmailiView.vue'),
+  },
+  {
     path: '/admin/prehlad',
     name: 'admin-prehlad',
     meta: { section: 'admin', title: 'Prehľad', requiresRole: 'admin' },
