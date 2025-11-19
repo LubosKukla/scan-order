@@ -93,6 +93,22 @@ Tento dokument sumarizuje dostupné UI komponenty a layoutové prvky v projekte 
   - Tlačidlo „Uložiť“ volá `useSnackbar().notify` a modal zatvorí.
 - **Poznámka:** Ikony sú centralizované v `web/src/constants/categoryIcons.js` (exporty `CATEGORY_ICONS`, `CATEGORY_ICON_OPTIONS`, `resolveCategoryIcon`). Pri rozšírení stačí doplniť záznam do tejto mapy.
 
+### 3.3 AdminMenuBox (`web/src/components/layout/funkcionality/AdminMenuBox.vue`)
+
+- **Účel:** karta reprezentujúca jedlo v administrácii (obrázok, názov, cena, kategória, stav).
+- **Prop:** `item` s kľúčmi `{ id, name, price, categoryLabel, categoryKey, image, active }`.
+- **Funkcie:** badge s ikonou kategórie (`resolveCategoryIcon`), cena formátovaná cez `formatCurrency`, prepínač viditeľnosti (`BaseToggle`) s okamžitou snackbar odozvou.
+- **Akcie:** ikonky `edit`/`trash` (BaseButton) otvárajú:
+  - `MenuItemModal` v režime `edit`.
+  - Konfirmačný `BaseModal` pre odstránenie položky.
+
+### 3.4 MenuItemModal (`web/src/components/layout/modals/MenuItemModal.vue`)
+
+- **Účel:** univerzálny modal pre vytváranie aj úpravu jedla (používa ho SpravaMenuView aj AdminMenuBox).
+- **Prop:** `modelValue` (`Boolean`), `mode` (`'create' | 'edit'`), `item` (detail položky).
+- **Obsah:** taby so sekciami (aktuálne „Základné“ – BaseInput, BaseTextarea, BaseSelect, BaseToggle, BaseCard). Ostatné taby (Varianty, Prídavky, Úpravy, Bonusy) sú zatiaľ zakázané.
+- **Emit:** `update:modelValue` pri zatváraní a `save` s payloadom formulára; modal sa po uložení zatvorí sám.
+
 ## 4. Web layout
 
 ### 4.1 WebHeader (`web/src/components/layout/header/WebHeader.vue`)
