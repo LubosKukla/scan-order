@@ -18,7 +18,7 @@
           @mouseleave="handleMouseLeave"
         >
           <span
-            class="snackbar-icon inline-flex h-7 w-7 items-center justify-center rounded-full"
+            class="snackbar-icon inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary"
             :class="iconClass(snackbar.variant)"
           >
             <font-awesome-icon :icon="iconFor(snackbar.variant, snackbar.icon)" class="text-white" />
