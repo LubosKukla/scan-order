@@ -1,16 +1,12 @@
 <template>
-  <BaseCard noPadding="true" class="overflow-hidden p-0 flex flex-col">
+  <BaseCard noPadding class="overflow-hidden flex flex-col">
     <img :src="item.image" :alt="item.name" class="h-48 w-full object-cover" />
     <div class="flex-1 space-y-3 p-4">
       <div class="flex items-start justify-between gap-2 flex-col xl:flex-row">
-        <div>
-          <p class="text-lg font-semibold text-deep">{{ item.name }}</p>
-        </div>
+        <p class="text-lg font-semibold text-deep">{{ item.name }}</p>
         <p class="text-primary font-semibold">{{ formattedPrice }}</p>
       </div>
-      <div
-        class="inline-flex items-center gap-2 rounded-lg bg-deep/90 hover:bg-deep px-3 py-1 text-xs font-semibold text-white"
-      >
+      <div class="inline-flex items-center gap-2 rounded-lg bg-deep/90 hover:bg-deep px-3 py-1 text-xs font-semibold text-white">
         <font-awesome-icon :icon="categoryIcon" />
         <span>{{ item.categoryLabel }}</span>
       </div>
@@ -19,19 +15,13 @@
     <div class="flex items-center justify-between p-4 flex-wrap gap-4">
       <BaseToggle v-model="localActive" :label="localActive ? 'Aktívne' : 'Neaktívne'" />
       <div class="flex items-center gap-3 w-full justify-between 2xl:w-auto">
-        <BaseButton variant="secondary" icon="edit" @click="showEditModal = true"></BaseButton>
-        <BaseButton variant="secondary" icon="trash" @click="showDeleteModal = true"></BaseButton>
+        <BaseButton variant="secondary" icon="edit" @click="showEditModal = true" />
+        <BaseButton variant="secondary" icon="trash" @click="showDeleteModal = true" />
       </div>
     </div>
   </BaseCard>
 
-  <BaseModal v-model="showEditModal" title="Upraviť jedlo">
-    <p class="text-deep">Tu bude formulár pre úpravu položky {{ item.name }}.</p>
-    <template #footer>
-      <BaseButton variant="secondary" @click="showEditModal = false">Zavrieť</BaseButton>
-      <BaseButton @click="confirmEdit">Uložiť</BaseButton>
-    </template>
-  </BaseModal>
+  <MenuItemModal v-model="showEditModal" mode="edit" :item="item" @save="confirmEdit" />
 
   <BaseModal v-model="showDeleteModal" title="Odstrániť položku">
     <p class="text-deep">Naozaj chcete odstrániť položku {{ item.name }} z menu?</p>
@@ -51,10 +41,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { resolveCategoryIcon } from '@/constants/categoryIcons';
 import { formatCurrency } from '@/utils/formatters';
 import { useSnackbar } from '@/composables/useSnackbar';
+import MenuItemModal from '@/components/layout/modals/MenuItemModal.vue';
 
 export default {
   name: 'AdminMenuBox',
-  components: { BaseCard, BaseButton, BaseModal, BaseToggle, FontAwesomeIcon },
+  components: { BaseCard, BaseButton, BaseModal, BaseToggle, FontAwesomeIcon, MenuItemModal },
   props: {
     item: {
       type: Object,
@@ -78,8 +69,9 @@ export default {
     },
   },
   methods: {
-    confirmEdit() {
-      this.snackbar.notify({ message: 'Položka bola aktualizovaná.', variant: 'success' });
+    confirmEdit(updatedItem) {
+      const name = updatedItem?.name || this.item.name;
+      this.snackbar.notify({ message: `Položka „${name}“ bola aktualizovaná.`, variant: 'success' });
       this.showEditModal = false;
     },
     confirmDelete() {
@@ -93,6 +85,14 @@ export default {
         message: value ? 'Položka je aktívna.' : 'Položka bola deaktivovaná.',
         variant: 'info',
       });
+    },
+    item: {
+      deep: true,
+      handler(newValue) {
+        if (typeof newValue?.active === 'boolean') {
+          this.localActive = newValue.active;
+        }
+      },
     },
   },
 };

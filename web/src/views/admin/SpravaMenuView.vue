@@ -2,7 +2,7 @@
   <section class="page space-y-6">
     <AdminPageHeader
       title="Správa menu"
-      subtitle="Spravujte jedlá, varianty, prílohy, kategórie a všetko čo potrebujete k vytvoreniu online menu."
+      subtitle="Spravujte jedlá, varianty, prílohy, kategórie a všetko potrebné k online menu."
       action-label="Pridať jedlo"
       @action-click="showAddModal = true"
     />
@@ -15,24 +15,24 @@
     </div>
   </section>
 
-  <BaseModal v-model="showAddModal" title="Pridať nové jedlo">
-    <p class="text-deep">Tu bude formulár pre pridanie jedla.</p>
-  </BaseModal>
+  <MenuItemModal v-model="showAddModal" mode="create" @save="handleCreate" />
 </template>
 
 <script>
 import AdminPageHeader from '@/components/layout/funkcionality/AdminPageHeader.vue';
 import AdminCategoryList from '@/components/layout/funkcionality/AdminCategoryList.vue';
 import AdminMenuBox from '@/components/layout/funkcionality/AdminMenuBox.vue';
-import BaseModal from '@/components/global/containers/BaseModal.vue';
+import MenuItemModal from '@/components/layout/modals/MenuItemModal.vue';
+import { useSnackbar } from '@/composables/useSnackbar';
 
 export default {
   name: 'AdminSpravaMenuView',
-  components: { AdminPageHeader, AdminCategoryList, AdminMenuBox, BaseModal },
+  components: { AdminPageHeader, AdminCategoryList, AdminMenuBox, MenuItemModal },
   data() {
     return {
       showAddModal: false,
       selectedCategory: 'all',
+      snackbar: useSnackbar(),
       menuItems: [
         {
           id: 'pizza-1',
@@ -81,7 +81,7 @@ export default {
         },
         {
           id: 'drinks-1',
-          name: 'Domáda limonáda',
+          name: 'Domáca limonáda',
           price: 3.2,
           categoryLabel: 'Nápoje',
           categoryKey: 'drinks',
@@ -95,6 +95,15 @@ export default {
     filteredItems() {
       if (this.selectedCategory === 'all') return this.menuItems;
       return this.menuItems.filter((item) => item.categoryKey === this.selectedCategory);
+    },
+  },
+  methods: {
+    handleCreate(payload) {
+      this.snackbar.notify({
+        message: `Jedlo „${payload.name || 'Nová položka'}“ bolo uložené.`,
+        variant: 'success',
+      });
+      this.showAddModal = false;
     },
   },
 };
