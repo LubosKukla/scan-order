@@ -78,6 +78,9 @@ class AuthController extends Controller
             'type_kitchen_ids'       => ['required_without:type_kitchen_custom', 'array'],
             'type_kitchen_ids.*'     => ['integer', 'exists:type_kitchen,id'],
             'type_kitchen_custom'    => ['required_without:type_kitchen_ids', 'string', 'min:2', 'max:255'],
+
+            //este treba doplnit otvaracie hodiny 
+            //doplnit description, logo a platbu predvolenu
         ]);
 
         $user = null;
