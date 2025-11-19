@@ -83,6 +83,9 @@ import BaseCard from '../../components/global/containers/BaseCard.vue';
 import RegisterStepOne from '../../components/admin/register/RegisterStepOne.vue';
 import RegisterStepTwo from '../../components/admin/register/RegisterStepTwo.vue';
 import RegisterStepThree from '../../components/admin/register/RegisterStepThree.vue';
+import { useSnackbar } from '../../composables/useSnackbar';
+
+const snackbar = useSnackbar();
 
 export default {
   name: 'AdminRegisterView',
@@ -171,6 +174,9 @@ export default {
       }
     },
     finishRegistration() {
+      snackbar.notify({
+        message: 'Boli ste úspešne registrovaný',
+      });
       this.$emit('register-submit', { ...this.form });
     },
   },

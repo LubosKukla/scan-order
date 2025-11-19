@@ -14,6 +14,7 @@
       <AdminFooter v-if="showAdmin" />
     </div>
   </div>
+  <SnackbarStack />
 </template>
 
 <script>
@@ -21,6 +22,7 @@ import WebHeader from './components/layout/header/WebHeader.vue';
 import NavBarAdmin from './components/layout/header/NavBarAdmin.vue';
 import AdminHeaderPanel from './components/layout/header/AdminHeaderPanel.vue';
 import AdminFooter from './components/layout/footer/AdminFooter.vue';
+import SnackbarStack from './components/global/feedback/SnackbarStack.vue';
 
 export default {
   name: 'AppRoot',
@@ -29,6 +31,7 @@ export default {
     NavBarAdmin,
     AdminHeaderPanel,
     AdminFooter,
+    SnackbarStack,
   },
   computed: {
     isWebSection() {
