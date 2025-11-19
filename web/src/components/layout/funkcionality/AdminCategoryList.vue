@@ -1,5 +1,5 @@
-<template>
-  <BaseCard class="space-y-4">
+﻿<template>
+  <BaseCard class="space-y-4 h-fit">
     <p class="text-base font-semibold text-deep">Kategórie</p>
     <nav class="flex flex-col gap-2" aria-label="Kategórie menu">
       <button
@@ -52,9 +52,7 @@
           />
           <div class="flex items-center justify-between">
             <BaseToggle v-model="category.hidden" :label="category.hidden ? 'Skryté' : 'Zobrazené'" />
-            <BaseButton variant="secondary" @click="removeCategory(category.id)">
-              <font-awesome-icon :icon="trashIcon" />
-            </BaseButton>
+            <BaseButton variant="secondary" icon="trash" @click="removeCategory(category.id)"></BaseButton>
           </div>
         </div>
         <div class="flex justify-end gap-3 pt-2">
@@ -74,88 +72,8 @@ import BaseSelect from '@/components/global/inputs/BaseSelect.vue';
 import BaseInput from '@/components/global/inputs/BaseInput.vue';
 import BaseToggle from '@/components/global/inputs/BaseToggle.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faUtensils,
-  faPizzaSlice,
-  faBurger,
-  faBowlFood,
-  faLeaf,
-  faIceCream,
-  faMugHot,
-  faTrashCan,
-  faFish,
-  faBacon,
-  faEgg,
-  faMartiniGlassCitrus,
-  faCoffee,
-  faChampagneGlasses,
-  faCheese,
-  faDrumstickBite,
-  faHotdog,
-  faBreadSlice,
-  faWineGlass,
-  faGlassCheers,
-  faMugSaucer,
-  faCarrot,
-  faAppleWhole,
-  faPepperHot,
-  faSeedling,
-  faBeerMugEmpty,
-  faWineBottle,
-  faGlassWater,
-  faCookie,
-  faBowlRice,
-} from '@fortawesome/free-solid-svg-icons';
+import { CATEGORY_ICON_OPTIONS, resolveCategoryIcon } from '@/constants/categoryIcons';
 import { useSnackbar } from '@/composables/useSnackbar';
-
-const ICONS = {
-  // všeobecné
-  utensils: { label: 'Všetky', icon: faUtensils },
-  mains: { label: 'Hlavné jedlá', icon: faUtensils },
-
-  // jedlá
-  pizza: { label: 'Pizza', icon: faPizzaSlice },
-  burger: { label: 'Burgery', icon: faBurger },
-  hotdog: { label: 'Street food', icon: faHotdog },
-  pasta: { label: 'Cestoviny', icon: faBowlFood },
-  soups: { label: 'Polievky', icon: faBowlFood },
-  fish: { label: 'Ryby', icon: faFish },
-  salad: { label: 'Šaláty', icon: faLeaf },
-  brunch: { label: 'Raňajky / Brunch', icon: faEgg },
-  bacon: { label: 'Gril / BBQ', icon: faBacon },
-  chicken: { label: 'Mäsové jedlá', icon: faDrumstickBite },
-  sides: { label: 'Prílohy', icon: faBowlRice },
-  bread: { label: 'Pečivo', icon: faBreadSlice },
-  cheese: { label: 'Syry', icon: faCheese },
-  kids: { label: 'Detské menu', icon: faHotdog },
-
-  // špeciálne / suroviny
-  ingredients: { label: 'Suroviny', icon: faAppleWhole },
-  vegetarian: { label: 'Vegetariánske', icon: faCarrot },
-  vegan: { label: 'Vegánske', icon: faSeedling },
-  spicy: { label: 'Pikantné', icon: faPepperHot },
-
-  // dezerty
-  dessert: { label: 'Dezerty', icon: faIceCream },
-  icecream: { label: 'Zmrzlina', icon: faIceCream },
-  coffeeDessert: { label: 'Káva & koláč', icon: faCookie },
-
-  // nápoje – nealko
-  drinks: { label: 'Nápoje', icon: faMugHot },
-  softDrinks: { label: 'Nealko', icon: faGlassWater },
-  coffee: { label: 'Káva', icon: faCoffee },
-  tea: { label: 'Čaj', icon: faMugSaucer },
-
-  // nápoje – alko
-  beer: { label: 'Pivo', icon: faBeerMugEmpty },
-  wine: { label: 'Vína', icon: faWineGlass },
-  spirits: { label: 'Destiláty', icon: faWineBottle },
-  cocktails: { label: 'Kokteily', icon: faMartiniGlassCitrus },
-
-  // eventy / atmosféra
-  celebration: { label: 'Oslavy', icon: faChampagneGlasses },
-  cheers: { label: 'Prípitky', icon: faGlassCheers },
-};
 
 export default {
   name: 'AdminCategoryList',
@@ -170,7 +88,6 @@ export default {
   data() {
     return {
       showEditor: false,
-      trashIcon: faTrashCan,
       snackbar: useSnackbar(),
       categories: [
         { id: 'all', name: 'Všetky', iconKey: 'utensils', count: 6, hidden: false },
@@ -186,16 +103,12 @@ export default {
   },
   computed: {
     iconOptions() {
-      return Object.entries(ICONS).map(([key, value]) => ({
-        key,
-        label: value.label,
-        icon: value.icon,
-      }));
+      return CATEGORY_ICON_OPTIONS;
     },
   },
   methods: {
     iconComponent(key) {
-      return ICONS[key]?.icon || ICONS.utensils.icon;
+      return resolveCategoryIcon(key);
     },
     updateIcon(category, value) {
       category.iconKey = value;

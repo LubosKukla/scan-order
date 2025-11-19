@@ -39,7 +39,7 @@
 
     <button
       type="button"
-      class="mt-auto flex items-center justify-center border-t border-ink/10 px-4 py-4 text-ink/70 transition-colors cursor-pointer duration-200 hover:text-white"
+      class="mt-auto sticky bottom-0 flex items-center justify-center border-t border-ink/10 px-4 py-4 text-ink/70 transition-colors cursor-pointer duration-200 hover:text-white"
       @click="toggleCollapse"
       aria-label="Prepnut zobrazenie navigacie"
     >

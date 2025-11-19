@@ -91,7 +91,7 @@ Tento dokument sumarizuje dostupné UI komponenty a layoutové prvky v projekte 
     - Prepínač „Skryť / Zobraziť“ (BaseToggle).
     - Tlačidlo koša (BaseButton s ikonou `trash`).
   - Tlačidlo „Uložiť“ volá `useSnackbar().notify` a modal zatvorí.
-- **Poznámka:** Zoznam ikon je definovaný v konštante `ICONS`. Pri rozšírení kategórií stačí doplniť záznam.
+- **Poznámka:** Ikony sú centralizované v `web/src/constants/categoryIcons.js` (exporty `CATEGORY_ICONS`, `CATEGORY_ICON_OPTIONS`, `resolveCategoryIcon`). Pri rozšírení stačí doplniť záznam do tejto mapy.
 
 ## 4. Web layout
 
