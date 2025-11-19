@@ -54,7 +54,14 @@ class AuthController extends Controller
 
     public function registerRestaurant(Request $request)
     {
-        $request->validate([]);
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'name_boss' => ['nullable', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'accept_gdpr' => ['required', 'accepted']
+        ]);
     }
 
     public function login(Request $request)
