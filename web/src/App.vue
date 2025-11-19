@@ -8,7 +8,7 @@
       <template v-else-if="showInMore">
         <WebHeader />
       </template>
-      <main :class="{ 'flex-1 px-6 py-8': showAdmin }">
+      <main :class="{ 'flex-1 px-6 py-8': showAdmin }" class="bg-ink">
         <router-view />
       </main>
       <template v-if="showAdmin">

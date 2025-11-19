@@ -51,7 +51,7 @@ export default {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(4, 8, 13, 0.65);
+  background: rgba(4, 8, 13, 0.25);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
