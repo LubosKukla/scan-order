@@ -41,7 +41,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'accept_gdpr' => 'boolean',
     ];
 
     public function customer()
@@ -54,12 +54,12 @@ class User extends Authenticatable
         return $this->hasMany(Restaurant::class);
     }
 
-    public function isCustomer()
+    public function isCustomer(): bool
     {
         return $this->customer()->exists();
     }
 
-    public function isRestaurant()
+    public function isRestaurant(): bool
     {
         return $this->restaurants()->exists();
     }
