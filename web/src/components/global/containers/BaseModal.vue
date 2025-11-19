@@ -7,7 +7,7 @@
             <slot name="title">
               <h2 class="text-lg font-semibold text-deep">{{ title }}</h2>
             </slot>
-            <button class="close-btn" @click="close" aria-label="Zavrieť">×</button>
+            <button v-if="showClose" class="close-btn" @click="close" aria-label="Zavrieť">×</button>
           </header>
           <div class="modal-body">
             <slot />
@@ -32,6 +32,10 @@ export default {
     title: {
       type: String,
       default: '',
+    },
+    showClose: {
+      type: Boolean,
+      default: true,
     },
   },
   methods: {
