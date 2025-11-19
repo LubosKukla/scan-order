@@ -17,11 +17,12 @@ class Restaurant extends Model
         'is_active',
         'name',
         'name_boss',
-        'type_of_restaurant',
+        'type_restaurant_id',
         'description',
         'logo_path',
         'address_id',
         'user_id',
+        'pocet_stolov',
     ];
 
     public function address()
@@ -57,5 +58,15 @@ class Restaurant extends Model
     public function workers()
     {
         return $this->hasMany(Worker::class);
+    }
+
+    public function typeRestaurant()
+    {
+        return $this->belongsTo(Type_restaurant::class);
+    }
+
+    public function kitchens()
+    {
+        return $this->belongsToMany(Type_kitchen::class, 'restaurant_type_kitchen');
     }
 }
