@@ -203,6 +203,14 @@ const routes = [
     meta: { section: 'admin', title: 'Predplatné', requiresRole: 'admin' },
     component: () => import('../views/admin/PredplatneView.vue'),
   },
+
+  //404
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    meta: { section: 'web', title: 'Stránka nenájdená', useWebShell: true },
+    component: () => import('../views/web/NotFoundView.vue'),
+  },
 ];
 
 const router = createRouter({
