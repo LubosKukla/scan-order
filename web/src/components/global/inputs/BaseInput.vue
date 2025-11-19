@@ -25,10 +25,7 @@
       >
         <font-awesome-icon :icon="passwordVisible ? faEyeSlash : faEye" class="h-5 w-5" />
       </div>
-      <div
-        v-if="showsSearchIcon"
-        class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-deep/40"
-      >
+      <div v-if="showsSearchIcon" class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-deep/40">
         <font-awesome-icon :icon="faSearch" class="h-4 w-4" />
       </div>
     </div>
@@ -107,11 +104,8 @@ export default {
     },
     inputClasses() {
       const base =
-        'w-full rounded-xl border border-surface/10 bg-ink py-2 text-sm font-semibold text-deep placeholder:text-deep/60 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10 focus:outline-none transition disabled:cursor-not-allowed disabled:opacity-50';
-      const padding = [
-        this.showsSearchIcon ? 'pl-12' : 'pl-4',
-        this.showsPasswordToggle ? 'pr-14' : 'pr-4',
-      ];
+        'w-full rounded-xl border border-surface/10 bg-ink py-2 mt-1 text-sm font-semibold text-deep placeholder:text-deep/60 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10 focus:outline-none transition disabled:cursor-not-allowed disabled:opacity-50';
+      const padding = [this.showsSearchIcon ? 'pl-12' : 'pl-4', this.showsPasswordToggle ? 'pr-14' : 'pr-4'];
       return [base, ...padding].join(' ');
     },
   },

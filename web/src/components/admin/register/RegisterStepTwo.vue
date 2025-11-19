@@ -1,0 +1,125 @@
+﻿<template>
+  <form class="space-y-1" @submit.prevent="handleSubmit">
+    <BaseSelect
+      :modelValue="form.restaurantType"
+      :options="restaurantTypes"
+      label="Typ reštaurácie"
+      placeholder="Vyberte typ"
+      @update:modelValue="updateField('restaurantType', $event)"
+    />
+    <BaseSelect
+      :modelValue="form.cuisineType"
+      :options="cuisineTypes"
+      label="Typ kuchyne"
+      placeholder="Vyberte typ kuchyne"
+      @update:modelValue="updateField('cuisineType', $event)"
+    />
+
+    <div class="space-y-4">
+      <BaseInput
+        id="street"
+        :modelValue="form.street"
+        label="Ulica a číslo"
+        placeholder="Hlavná 123"
+        @update:modelValue="updateField('street', $event)"
+      />
+      <div class="grid gap-4 md:grid-cols-2">
+        <BaseInput
+          id="city"
+          :modelValue="form.city"
+          label="Mesto"
+          placeholder="Bratislava"
+          @update:modelValue="updateField('city', $event)"
+        />
+        <BaseInput
+          id="zip"
+          :modelValue="form.zip"
+          label="PSČ"
+          placeholder="811 01"
+          @update:modelValue="updateField('zip', $event)"
+        />
+      </div>
+    </div>
+
+    <div class="space-y-3 p-2">
+      <div>
+        <p class="text-base font-bold text-deep">Otváracie hodiny (voliteľné)</p>
+        <p class="text-sm text-deep/80">Môžete vyplniť neskôr v nastaveniach</p>
+      </div>
+      <div class="space-y-1 max-w-xl m-auto">
+        <div v-for="day in days" :key="day.key" class="flex flex-wrap justify-end gap-3 items-center">
+          <span class="text-sm font-semibold w-20 text-deep mr-auto">{{ day.label }}</span>
+          <BaseTimePicker
+            :modelValue="form.openingHours[day.key].from"
+            :label="null"
+            placeholder="--:--"
+            @update:modelValue="updateOpening(day.key, 'from', $event)"
+            class="max-w-xs"
+          />
+          <BaseTimePicker
+            :modelValue="form.openingHours[day.key].to"
+            :label="null"
+            placeholder="--:--"
+            @update:modelValue="updateOpening(day.key, 'to', $event)"
+            class="max-w-xs"
+          />
+        </div>
+      </div>
+    </div>
+
+    <BaseTextarea
+      id="description"
+      :modelValue="form.description"
+      label="Krátky popis reštaurácie"
+      placeholder="Napíšte krátky popis vašej reštaurácie..."
+      rows="4"
+      @update:modelValue="updateField('description', $event)"
+    />
+
+    <BaseUpload
+      :modelValue="form.logo"
+      label="Logo reštaurácie (voliteľné)"
+      placeholder="Nahrať logo"
+      @update:modelValue="updateField('logo', $event)"
+    />
+
+    <div class="flex flex-col gap-3 md:flex-row">
+      <BaseButton variant="secondary" type="button" class="flex-1 justify-center" @click="$emit('prev')">
+        Späť
+      </BaseButton>
+      <BaseButton type="submit" class="flex-1 justify-center">Pokračovať</BaseButton>
+    </div>
+  </form>
+</template>
+
+<script>
+import BaseInput from '../../global/inputs/BaseInput.vue';
+import BaseButton from '../../global/buttons/BaseButton.vue';
+import BaseSelect from '../../global/inputs/BaseSelect.vue';
+import BaseTimePicker from '../../global/inputs/BaseTimePicker.vue';
+import BaseTextarea from '../../global/inputs/BaseTextarea.vue';
+import BaseUpload from '../../global/inputs/BaseUpload.vue';
+
+export default {
+  name: 'RegisterStepTwo',
+  components: { BaseInput, BaseButton, BaseSelect, BaseTimePicker, BaseTextarea, BaseUpload },
+  props: {
+    form: { type: Object, required: true },
+    restaurantTypes: { type: Array, required: true },
+    cuisineTypes: { type: Array, required: true },
+    days: { type: Array, required: true },
+  },
+  emits: ['update-field', 'update-opening-hours', 'next', 'prev'],
+  methods: {
+    updateField(field, value) {
+      this.$emit('update-field', { field, value });
+    },
+    updateOpening(day, key, value) {
+      this.$emit('update-opening-hours', { day, key, value });
+    },
+    handleSubmit() {
+      this.$emit('next');
+    },
+  },
+};
+</script>
