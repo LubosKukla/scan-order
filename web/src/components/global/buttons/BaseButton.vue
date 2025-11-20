@@ -22,6 +22,8 @@ import {
   faArrowRightToBracket,
   faPenToSquare,
   faTrash,
+  faEye,
+  faReply,
 } from '@fortawesome/free-solid-svg-icons';
 
 const ICONS = {
@@ -35,6 +37,8 @@ const ICONS = {
   login: faArrowRightToBracket,
   edit: faPenToSquare,
   trash: faTrash,
+  view: faEye,
+  reply: faReply,
 };
 
 export default {
@@ -49,7 +53,7 @@ export default {
     variant: {
       type: String,
       default: 'primary',
-      validator: (value) => ['primary', 'secondary'].includes(value),
+      validator: (value) => ['primary', 'secondary', 'noBackground'].includes(value),
     },
     icon: {
       type: String,
@@ -74,6 +78,9 @@ export default {
         return this.disabled
           ? 'bg-white text-deep border border-[0.1rem] border-deep/20'
           : 'bg-white text-deep border border-[0.1rem] border-deep/20 hover:bg-ink/40 hover:border-deep/40 hover:-translate-y-0.5';
+      }
+      if (this.variant === 'noBackground') {
+        return this.disabled ? 'bg-transparent text-deep/50' : 'bg-transparent text-deep hover:text-primary';
       }
       return this.disabled
         ? 'bg-primary text-white'

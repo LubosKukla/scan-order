@@ -2,7 +2,7 @@
   <footer class="w-full">
     <div class="bg-white text-center border-t border-black/5 shadow-[0_-1px_6px_rgba(0,0,0,0.08)]">
       <div
-        class="mx-auto max-w-6xl px-4 py-3 text-xs font-small text-deep/70 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2"
+        class="mx-auto max-w-6xl px-4 py-3 text-xs font-small text-deep/70 flex flex-row flex-wrap items-center justify-center gap-1 sm:gap-2"
       >
         <span>&copy; Scan&Order 2025</span>
         <span class="hidden sm:inline text-deep/30">•</span>

@@ -53,7 +53,7 @@
         <p class="text-sm text-deep">Zobrazuje sa {{ filteredReviews.length }} z {{ reviews.length }} recenzií</p>
       </div>
 
-      <div class="hidden xl:block overflow-x-auto">
+      <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-ink/20 text-sm">
           <thead>
             <tr class="text-left text-xs font-semibold uppercase text-deep/60">
@@ -93,24 +93,9 @@
               </td>
               <td class="padding-item text-right">
                 <div class="flex items-center justify-end gap-2">
-                  <BaseButton
-                    variant="noBackground"
-                    icon="view"
-                    class="text-deep/70 hover:text-primary"
-                    @click="openView(review)"
-                  />
-                  <BaseButton
-                    variant="noBackground"
-                    icon="reply"
-                    class="text-deep/70 hover:text-primary"
-                    @click="openReply(review)"
-                  />
-                  <BaseButton
-                    variant="noBackground"
-                    icon="trash"
-                    class="text-danger hover:text-danger"
-                    @click="openDelete(review)"
-                  />
+                  <BaseButton variant="noBackground" icon="view" class="text-deep/70 hover:text-primary" />
+                  <BaseButton variant="noBackground" icon="reply" class="text-deep/70 hover:text-primary" />
+                  <BaseButton variant="noBackground" icon="trash" class="text-danger hover:text-danger" />
                 </div>
               </td>
             </tr>
@@ -120,124 +105,7 @@
           </tbody>
         </table>
       </div>
-
-      <div class="space-y-3 xl:hidden">
-        <BaseCard
-          v-for="review in filteredReviews"
-          :key="`mobile-${review.id}`"
-          class="border border-ink/20 bg-white shadow-sm space-y-3"
-        >
-          <div class="flex md:items-center justify-between flex-col gap-2 md:flex-row items-start">
-            <ReviewTypeBadge :type="review.type" />
-            <ReviewSourceTag :type="review.sourceType" :label="review.sourceLabel" />
-          </div>
-          <div>
-            <p class="font-semibold text-deep">{{ review.reviewer }}</p>
-            <p class="text-xs text-deep/90">{{ formatDate(review.date) }}</p>
-          </div>
-          <ReviewRatingDisplay :rating="review.rating" />
-          <p class="text-sm text-deep">{{ review.comment }}</p>
-          <p v-if="review.dishDescription" class="text-xs text-deep/90">{{ review.dishDescription }}</p>
-
-          <div class="flex items-center justify-end gap-2">
-            <BaseButton
-              variant="noBackground"
-              icon="view"
-              class="text-deep/70 hover:text-primary"
-              @click="openView(review)"
-            />
-            <BaseButton
-              variant="noBackground"
-              icon="reply"
-              class="text-deep/70 hover:text-primary"
-              @click="openReply(review)"
-            />
-            <BaseButton
-              variant="noBackground"
-              icon="trash"
-              class="text-danger hover:text-danger"
-              @click="openDelete(review)"
-            />
-          </div>
-        </BaseCard>
-        <p v-if="!filteredReviews.length" class="text-center text-sm text-ink/60">
-          Žiadne recenzie pre zvolené filtre.
-        </p>
-      </div>
     </BaseCard>
-
-    <BaseModal v-model="viewModalVisible" title="Detail recenzie">
-      <div v-if="selectedReview" class="space-y-4">
-        <p class="text-sm font-semibold text-deep">{{ typeLabel(selectedReview.type) }}</p>
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <p class="text-lg font-semibold text-deep">{{ selectedReview.reviewer }}</p>
-            <p class="text-xs text-deep/90">{{ formatDate(selectedReview.date) }}</p>
-          </div>
-          <ReviewSourceTag :type="selectedReview.sourceType" :label="selectedReview.sourceLabel" />
-        </div>
-        <ReviewRatingDisplay :rating="selectedReview.rating" showValue="true" />
-        <BaseCard class="bg-ink/40 border-none">
-          <p class="text-sm text-deep">{{ selectedReview.comment }}</p>
-          <p v-if="selectedReview.dishDescription" class="text-xs text-deep/80 mt-2">
-            {{ selectedReview.dishDescription }}
-          </p>
-        </BaseCard>
-      </div>
-      <template #footer>
-        <BaseButton variant="secondary" @click="viewModalVisible = false">Zavrieť</BaseButton>
-      </template>
-    </BaseModal>
-
-    <BaseModal v-model="replyModalVisible" title="Odpoveď na recenziu">
-      <div v-if="selectedReview" class="space-y-4">
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <p class="text-sm font-semibold text-deep/70">{{ typeLabel(selectedReview.type) }}</p>
-            <p class="text-lg font-semibold text-deep">{{ selectedReview.reviewer }}</p>
-            <p class="text-xs text-deep/60">{{ formatDate(selectedReview.date) }}</p>
-          </div>
-          <ReviewSourceTag :type="selectedReview.sourceType" :label="selectedReview.sourceLabel" />
-        </div>
-        <ReviewRatingDisplay :rating="selectedReview.rating" showValue="true" />
-        <BaseCard class="bg-ink/40 border-none">
-          <p class="text-sm text-deep">{{ selectedReview.comment }}</p>
-        </BaseCard>
-        <div class="space-y-2">
-          <BaseTextarea
-            v-model="replyForm.message"
-            label="Odpoveď na recenziu"
-            placeholder="Napíšte vašu odpoveď zákazníkovi..."
-            rows="4"
-          />
-        </div>
-        <BaseCard class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-semibold text-deep">Zobraziť odpoveď verejne</p>
-            <p class="text-xs text-deep/70">Odpoveď bude viditeľná pre všetkých zákazníkov</p>
-          </div>
-          <BaseToggle v-model="replyForm.public" />
-        </BaseCard>
-      </div>
-      <template #footer>
-        <BaseButton variant="secondary" @click="replyModalVisible = false">Zavrieť</BaseButton>
-        <BaseButton icon="send" :disabled="!replyForm.message.trim()" @click="submitReply">Odoslať odpoveď</BaseButton>
-      </template>
-    </BaseModal>
-
-    <BaseModal v-model="deleteModalVisible" title="Vymazať recenziu?">
-      <div class="space-y-3">
-        <p class="text-sm text-deep">
-          Ste si istý, že chcete odstrániť túto recenziu?
-          <strong v-if="selectedReview">{{ selectedReview.reviewer }}</strong>
-        </p>
-        <p class="text-xs text-ink/60">Táto akcia je nevratná.</p>
-      </div>
-      <template #footer>
-        <BaseButton variant="secondary" @click="deleteModalVisible = false">Zrušiť</BaseButton>
-        <BaseButton icon="trash" @click="confirmDelete">Odstrániť</BaseButton>
-      </template>
-    </BaseModal>
   </section>
 </template>
 
@@ -447,9 +315,6 @@ export default {
         ? 'bg-white text-primary shadow-sm'
         : 'bg-white/40 text-deep/70 hover:bg-white hover:text-primary';
     },
-    typeLabel(type) {
-      return type === 'dish' ? 'Recenzia jedla' : 'Recenzia reštaurácie';
-    },
     formatDate(dateValue) {
       if (!dateValue) return '';
       return new Intl.DateTimeFormat('sk-SK', {
@@ -462,26 +327,6 @@ export default {
       const date = new Date(review.date);
       const month = String(date.getMonth() + 1).padStart(2, '0');
       return `${date.getFullYear()}-${month}`;
-    },
-    openView(review) {
-      this.selectedReview = review;
-      this.viewModalVisible = true;
-    },
-    openReply(review) {
-      this.selectedReview = review;
-      this.replyForm = { message: '', public: true };
-      this.replyModalVisible = true;
-    },
-    openDelete(review) {
-      this.selectedReview = review;
-      this.deleteModalVisible = true;
-    },
-    submitReply() {
-      if (!this.replyForm.message.trim()) return;
-      this.replyModalVisible = false;
-    },
-    confirmDelete() {
-      this.deleteModalVisible = false;
     },
   },
 };

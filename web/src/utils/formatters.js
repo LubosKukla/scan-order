@@ -9,3 +9,11 @@ export function formatCurrency(value, locale = 'sk-SK', currency = 'EUR') {
     currency,
   }).format(value);
 }
+
+export function formatNumber(value, locale = 'sk-SK', options = {}) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) {
+    return '0';
+  }
+  const defaultOptions = { minimumFractionDigits: 1, maximumFractionDigits: 1 };
+  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(Number(value));
+}
