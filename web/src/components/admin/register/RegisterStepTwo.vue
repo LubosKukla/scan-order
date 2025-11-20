@@ -91,6 +91,7 @@
       label="Logo reštaurácie (voliteľné)"
       placeholder="Nahrať logo"
       @update:modelValue="updateField('logo', $event)"
+      class="mb-10"
     />
 
     <div class="flex flex-col gap-3 md:flex-row">

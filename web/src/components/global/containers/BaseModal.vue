@@ -44,6 +44,18 @@ export default {
       this.$emit('close');
     },
   },
+  watch: {
+    modelValue: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      },
+    },
+  },
 };
 </script>
 

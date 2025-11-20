@@ -3,7 +3,7 @@
     <label v-if="label" :for="inputId" class="text-sm font-bold text-deep">
       {{ label }}
     </label>
-    <div class="border border-ink rounded-2xl mt-2 mb-8">
+    <div class="border border-ink rounded-2xl my-2">
       <input
         :id="inputId"
         ref="fileInput"

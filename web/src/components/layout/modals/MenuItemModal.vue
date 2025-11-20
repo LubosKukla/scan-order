@@ -36,8 +36,8 @@
       <BaseUpload label="Nahrať obrázok" v-model="form.imageFile" placeholder="Vyberte obrázok" accept="image/*" />
 
       <img
-        v-if="imagePreview"
-        :src="imagePreview"
+        v-if="previewUrl"
+        :src="previewUrl"
         alt="Náhľad jedla"
         class="w-full rounded-2xl object-cover h-48 border border-ink/10"
       />
@@ -53,7 +53,87 @@
         </div>
       </BaseCard>
     </div>
-    <div v-else class="text-sm text-ink/70">Táto sekcia bude dostupná čoskoro.</div>
+    <div v-else-if="activeTab === 'variants'" class="space-y-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <div>
+          <p class="text-sm text-deep">Pridajte rôzne verzie jedla (napr. Malá, Veľká, XXL).</p>
+        </div>
+        <BaseButton size="sm" class="ml-auto" icon="add" @click="addVariant">Pridať variant</BaseButton>
+      </div>
+
+      <BaseCard
+        v-for="(variant, index) in variants"
+        :key="variant.id"
+        class="space-y-2 border border-deep/10 shadow-2xs"
+      >
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="font-semibold text-deep">Variant</p>
+            <p class="text-sm text-ink/60">#{{ index + 1 }}</p>
+          </div>
+          <button type="button" class="close-btn" @click="removeVariant(index)">&times;</button>
+        </div>
+
+        <BaseUpload
+          label="Nahrat obrazok variantu"
+          v-model="variant.imageFile"
+          placeholder="Vyberte obrazok"
+          accept="image/*"
+        />
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <BaseInput label="Nazov" v-model="variant.name" required placeholder="Double variant" />
+          <BaseInput label="Cena (EUR)" v-model="variant.price" type="number" min="0" step="0.1" required />
+        </div>
+        <BaseInput label="Hmotnost" v-model="variant.weight" placeholder="200g" />
+        <BaseTextarea
+          label="Popis"
+          v-model="variant.description"
+          placeholder="Krátky opis rozdielu variantu"
+          rows="2"
+        />
+      </BaseCard>
+
+      <div v-if="!variants.length" class="p-3 text-center text-sm text-deep">
+        Zatiaľ ste nepridali žiadny variant. Kliknite na
+        <strong>Pridať variant</strong>
+        a vyplňte informácie.
+      </div>
+    </div>
+    <div v-else-if="activeTab === 'addons'" class="space-y-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <div>
+          <p class="text-sm text-deep">Prídavky, ktoré si zákazník môže objednať k jedlu.</p>
+        </div>
+        <BaseButton size="sm" class="ml-auto" icon="add" @click="addAddon">Pridať prídavok</BaseButton>
+      </div>
+
+      <BaseCard v-for="(addon, index) in addons" :key="addon.id" class="space-y-3 border border-deep/10 shadow-2xs">
+        <div class="flex items-center justify-between gap-4">
+          <p class="font-semibold text-deep">Prídavok #{{ index + 1 }}</p>
+          <button type="button" class="close-btn" @click="removeAddon(index)">&times;</button>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <BaseInput label="Názov" v-model="addon.name" required placeholder="Extra syr" />
+          <BaseInput label="Cena (€)" v-model="addon.price" type="number" min="0" step="0.1" required />
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+          <BaseToggle
+            v-model="addon.available"
+            label="Dostupné"
+            class="flex flex-row-reverse items-center gap-2 text-sm"
+          />
+        </div>
+      </BaseCard>
+
+      <div v-if="!addons.length" class="p-3 text-center text-sm text-deep">
+        Zatiaľ ste nepridali žiadny prídavok. Kliknite na
+        <strong>Pridať prídavok</strong>
+        a vyplňte informácie.
+      </div>
+    </div>
 
     <template #footer>
       <div class="flex justify-end gap-3">
@@ -102,12 +182,11 @@ export default {
         description: '',
         preparationTime: '',
         allergens: '',
-        imageUrl: '',
         imageFile: null,
         visibleInMenu: true,
-        availableForDelivery: true,
-        onSiteOnly: false,
       },
+      variants: [],
+      addons: [],
       activeTab: 'basic',
       previewUrl: '',
       objectUrl: null,
@@ -135,9 +214,6 @@ export default {
         key: option.key,
         label: option.label,
       }));
-    },
-    imagePreview() {
-      return this.previewUrl || this.form.imageUrl;
     },
   },
   watch: {
@@ -173,21 +249,21 @@ export default {
         description: source.description || '',
         preparationTime: source.preparationTime || '',
         allergens: source.allergens || '',
-        imageUrl: source.imageUrl || source.image || '',
-        imageFile: null,
+        imageFile: source.image || source.imageFile || null,
         visibleInMenu: source.visibleInMenu !== undefined ? source.visibleInMenu : true,
-        availableForDelivery: source.availableForDelivery !== undefined ? source.availableForDelivery : true,
-        onSiteOnly: source.onSiteOnly || false,
       };
-      this.clearPreviewUrl();
-      this.previewUrl = this.form.imageUrl || '';
+      this.variants = Array.isArray(source.variants)
+        ? source.variants.map((variant) => this.createVariant(variant))
+        : [];
+      this.addons = Array.isArray(source.addons) ? source.addons.map((addon) => this.createAddon(addon)) : [];
+      this.setPreviewFromFile(this.form.imageFile);
       this.activeTab = 'basic';
     },
     handleCancel() {
       this.proxyVisible = false;
     },
     handleSubmit() {
-      this.$emit('save', { ...this.form, mode: this.mode });
+      this.$emit('save', { ...this.form, variants: this.variants, addons: this.addons, mode: this.mode });
       this.proxyVisible = false;
     },
     setPreviewFromFile(file) {
@@ -197,8 +273,6 @@ export default {
         this.previewUrl = this.objectUrl;
       } else if (typeof file === 'string') {
         this.previewUrl = file;
-      } else if (this.form.imageUrl) {
-        this.previewUrl = this.form.imageUrl;
       } else {
         this.previewUrl = '';
       }
@@ -209,9 +283,56 @@ export default {
         this.objectUrl = null;
       }
     },
+    createVariant(initial = {}) {
+      return {
+        id: initial.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        name: initial.name || '',
+        price: initial.price || '',
+        weight: initial.weight || '',
+        description: initial.description || '',
+        imageFile: initial.image || initial.imageFile || null,
+      };
+    },
+    addVariant() {
+      this.variants.push(this.createVariant());
+    },
+    removeVariant(index) {
+      this.variants.splice(index, 1);
+    },
+    createAddon(initial = {}) {
+      return {
+        id: initial.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        name: initial.name || '',
+        price: initial.price || '',
+        available: initial.available !== undefined ? initial.available : true,
+      };
+    },
+    addAddon() {
+      this.addons.push(this.createAddon());
+    },
+    removeAddon(index) {
+      this.addons.splice(index, 1);
+    },
   },
   beforeUnmount() {
     this.clearPreviewUrl();
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.close-btn {
+  font-size: 1.5rem;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #0f172a;
+  transition: transform 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    color: #0ccaba;
+    transform: scale(1.1);
+  }
+}
+</style>
