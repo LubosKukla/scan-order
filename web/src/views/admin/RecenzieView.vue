@@ -27,7 +27,11 @@
                 <p class="text-xs font-semibold text-left text-deep">{{ card.label }}</p>
                 <div class="space-y-1 f">
                   <p v-if="card.key !== 'averageRating'" class="text-md font-semibold text-deep">{{ card.value }}</p>
-                  <ReviewRatingDisplay v-if="card.key === 'averageRating'" :rating="averageRating" :show-value="true" />
+                  <ReviewRatingDisplay
+                    v-if="card.key === 'averageRating'"
+                    :rating="averageRating"
+                    :show-value="true"
+                  />
                 </div>
               </div>
               <span class="rounded-xl hidden sm:block bg-ink/60 p-3 text-primary">
@@ -161,7 +165,7 @@
             />
           </div>
         </BaseCard>
-        <p v-if="!filteredReviews.length" class="text-center text-sm text-ink/60">
+        <p v-if="!filteredReviews.length" class="text-center text-sm text-deep/60">
           Žiadne recenzie pre zvolené filtre.
         </p>
       </div>
@@ -232,7 +236,7 @@
           Ste si istý, že chcete odstrániť túto recenziu?
           <strong v-if="selectedReview">{{ selectedReview.reviewer }}</strong>
         </p>
-        <p class="text-xs text-ink/60">Táto akcia je nevratná.</p>
+        <p class="text-xs text-deep/60">Táto akcia je nevratná.</p>
       </div>
       <template #footer>
         <BaseButton variant="secondary" @click="deleteModalVisible = false">Zrušiť</BaseButton>

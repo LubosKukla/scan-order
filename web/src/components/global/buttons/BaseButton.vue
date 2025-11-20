@@ -24,6 +24,9 @@ import {
   faTrash,
   faEye,
   faReply,
+  faCircleCheck,
+  faCircleXmark,
+  faQrcode,
 } from '@fortawesome/free-solid-svg-icons';
 
 const ICONS = {
@@ -39,6 +42,9 @@ const ICONS = {
   trash: faTrash,
   view: faEye,
   reply: faReply,
+  confirm: faCircleCheck,
+  close: faCircleXmark,
+  qrcode: faQrcode,
 };
 
 export default {
