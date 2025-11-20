@@ -100,7 +100,12 @@
                     @click="openOrderPreview(order)"
                   />
                   <BaseButton variant="noBackground" icon="confirm" class="text-emerald-600 hover:text-emerald-700" />
-                  <BaseButton variant="noBackground" icon="close" class="text-danger hover:text-danger" />
+                  <BaseButton
+                    variant="noBackground"
+                    icon="close"
+                    class="text-danger hover:text-danger"
+                    @click="openDeleteModal(order)"
+                  />
                 </div>
               </td>
             </tr>
@@ -142,7 +147,12 @@
               @click="openOrderPreview(order)"
             />
             <BaseButton variant="noBackground" icon="confirm" class="text-emerald-600 hover:text-emerald-700" />
-            <BaseButton variant="noBackground" icon="close" class="text-danger hover:text-danger" />
+            <BaseButton
+              variant="noBackground"
+              icon="close"
+              class="text-danger hover:text-danger"
+              @click="openDeleteModal(order)"
+            />
           </div>
         </BaseCard>
         <p v-if="!filteredOrders.length" class="text-center text-sm text-deep/60">
@@ -176,52 +186,26 @@
         </BaseCard>
 
         <div class="grid gap-4 md:grid-cols-2">
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1 items-start">
             <p class="text-sm font-semibold text-deep/80">Zákazník</p>
             <p class="text-lg font-semibold text-deep">{{ selectedOrder.customer }}</p>
             <p class="text-xs text-deep/70">{{ selectedOrder.location }}</p>
           </div>
-          <div>
+          <div class="flex flex-col gap-1 items-start">
             <p class="text-sm font-semibold text-deep/80">Platba</p>
             <p class="text-lg font-semibold text-deep">{{ selectedOrder.payment }}</p>
           </div>
-          <div>
+          <div class="flex flex-col gap-1 items-start">
             <p class="text-sm font-semibold text-deep/80">Typ objednávky</p>
             <OrderTypeBadge :type="selectedOrder.type" />
           </div>
-          <div>
+          <div class="flex flex-col gap-1 items-start">
             <p class="text-sm font-semibold text-deep/80">Aktuálny stav</p>
             <OrderStatusBadge :status="selectedOrder.status" />
           </div>
         </div>
 
-        <div>
-          <p class="text-sm font-semibold text-deep mb-2">Objednané položky</p>
-          <BaseCard class="bg-ink space-y-2">
-            <div class="grid grid-cols-3 text-xs font-semibold text-deep/60">
-              <p>Položka</p>
-              <p class="text-center">Množstvo</p>
-              <p class="text-right">Cena</p>
-            </div>
-            <div
-              v-for="item in selectedOrder.items"
-              :key="`${item.name}-${item.variant}`"
-              class="grid grid-cols-3 items-center border-t border-ink/40 py-2 text-sm text-deep"
-            >
-              <div>
-                <p class="font-semibold">{{ item.name }}</p>
-                <p v-if="item.variant" class="text-xs text-deep/60">Varianta: {{ item.variant }}</p>
-              </div>
-              <p class="text-center">{{ item.quantity }}x</p>
-              <p class="text-right">{{ formatAmount(item.price * item.quantity) }}</p>
-            </div>
-            <div class="grid grid-cols-3 items-center border-t border-ink/40 pt-3 text-sm font-semibold text-deep">
-              <p>Celková suma</p>
-              <p></p>
-              <p class="text-right">{{ formatAmount(selectedOrder.total) }}</p>
-            </div>
-          </BaseCard>
-        </div>
+        <OrderItemsTable :items="selectedOrder.items" :total="selectedOrder.total" title="Objednané položky" />
 
         <div class="space-y-2">
           <p class="text-sm font-semibold text-deep/60">Aktualizovať stav</p>
@@ -234,6 +218,25 @@
           <BaseButton variant="secondary" icon="print">Vytlačiť účtenku</BaseButton>
           <BaseButton @click="previewVisible = false">Zavrieť</BaseButton>
         </div>
+      </template>
+    </BaseModal>
+
+    <BaseModal v-model="deleteModalVisible" title="Vymazať objednávku?">
+      <div class="space-y-4" v-if="selectedOrder">
+        <div>
+          <p class="text-sm text-deep">
+            Ste si istý, že chcete odstrániť objednávku
+            <strong>#{{ selectedOrder.id }}</strong>
+            ?
+          </p>
+          <p class="text-xs text-deep/60">Táto akcia sa nedá vrátiť.</p>
+        </div>
+
+        <OrderItemsTable :items="selectedOrder.items" :total="selectedOrder.total" title="Obsah objednávky" />
+      </div>
+      <template #footer>
+        <BaseButton variant="secondary" @click="deleteModalVisible = false">Zrušiť</BaseButton>
+        <BaseButton icon="trash" @click="confirmDelete">Odstrániť</BaseButton>
       </template>
     </BaseModal>
   </section>
@@ -251,6 +254,7 @@ import BaseButton from '@/components/global/buttons/BaseButton.vue';
 import BaseModal from '@/components/global/containers/BaseModal.vue';
 import OrderTypeBadge from '@/components/global/orders/OrderTypeBadge.vue';
 import OrderStatusBadge from '@/components/global/orders/OrderStatusBadge.vue';
+import OrderItemsTable from '@/components/global/orders/OrderItemsTable.vue';
 import { formatCurrency as formatCurrencyValue } from '@/utils/formatters';
 
 const minutesAgo = (mins) => {
@@ -355,6 +359,7 @@ export default {
     BaseModal,
     OrderTypeBadge,
     OrderStatusBadge,
+    OrderItemsTable,
     FontAwesomeIcon,
   },
   data() {
@@ -378,6 +383,7 @@ export default {
       previewVisible: false,
       selectedOrder: null,
       statusUpdate: 'new',
+      deleteModalVisible: false,
     };
   },
   computed: {
@@ -482,6 +488,14 @@ export default {
     adjustTime(seconds) {
       if (!this.selectedOrder) return;
       this.selectedOrder.remainingSeconds = Math.max(0, (this.selectedOrder.remainingSeconds || 0) + seconds);
+    },
+    openDeleteModal(order) {
+      this.selectedOrder = order;
+      this.deleteModalVisible = true;
+    },
+    confirmDelete() {
+      // TODO: implement remove action
+      this.deleteModalVisible = false;
     },
   },
 };
