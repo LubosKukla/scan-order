@@ -22,7 +22,7 @@
       <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div v-for="card in statCards" :key="card.key" class="flex flex-col gap-3">
           <BaseCard>
-            <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center md:justify-between justify-center sm:gap-4">
               <div class="flex flex-col items-start justify-between gap-1">
                 <p class="text-xs font-semibold text-left text-deep">{{ card.label }}</p>
                 <div class="space-y-1 f">
@@ -30,7 +30,7 @@
                   <ReviewRatingDisplay v-if="card.key === 'averageRating'" :rating="averageRating" :show-value="true" />
                 </div>
               </div>
-              <span class="rounded-xl bg-ink/60 p-3 text-primary">
+              <span class="rounded-xl hidden sm:block bg-ink/60 p-3 text-primary">
                 <font-awesome-icon :icon="card.icon" class="h-5 w-5" />
               </span>
             </div>
@@ -125,7 +125,8 @@
         <BaseCard
           v-for="review in filteredReviews"
           :key="`mobile-${review.id}`"
-          class="border border-ink/20 bg-white shadow-sm space-y-3"
+          class="border border-ink/20 shadow-sm space-y-3 p-4"
+          no-padding="true"
         >
           <div class="flex md:items-center justify-between flex-col gap-2 md:flex-row items-start">
             <ReviewTypeBadge :type="review.type" />
