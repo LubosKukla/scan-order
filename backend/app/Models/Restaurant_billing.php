@@ -20,6 +20,10 @@ class Restaurant_billing extends Model
         'subscription_status'
     ];
 
+    protected $casts = [
+        'trial_ends_at' => 'date',
+    ];
+
     public function plan()
     {
         return $this->belongsTo(Plan::class);
