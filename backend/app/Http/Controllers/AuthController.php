@@ -80,17 +80,18 @@ class AuthController extends Controller
             'type_kitchen_ids.*'     => ['integer', 'exists:type_kitchen,id'],
             'type_kitchen_custom'    => ['required_without:type_kitchen_ids', 'string', 'min:2', 'max:255'],
 
-            //este treba doplnit otvaracie hodiny 
-            //doplnit description, logo a platbu predvolenu
 
             'open_hours' => ['nullable', 'array'],
-            'open_hours.*' => ['time'],
+            'open_hours.*.week_day'   => ['required', 'integer', 'between:1,7'],
+            'open_hours.*.from'       => ['nullable', 'date_format:H:i'],
+            'open_hours.*.to'         => ['nullable', 'date_format:H:i'],
+            'open_hours.*.is_closed'  => ['nullable', 'boolean'],
 
             'description' => ['nullable', 'string', 'max:500'],
             //Este treba dokoncit aj nahravanie na ftp loga
             'logo_path' => ['nullable', 'string'],
 
-            'plan_id' => ['required', 'integer'],
+            'plan_id' => ['required', 'integer', 'exists:plans,id'],
 
             'number_tables' => ['nullable', 'integer']
         ]);
@@ -138,12 +139,28 @@ class AuthController extends Controller
 
             $restaurantId = $restaurant->id;
 
+            $trialEndsAt = now()->addMonths(3)->toDateString();
+
             $restaurantBilling = Restaurant_billing::create([
-                'restaurant_id' => $restaurantId,
-                'plan_id' => $data['plan_id'],
-                //este treba doplnit trial_ends_at
-                //subsription_status
+                'restaurant_id'       => $restaurantId,
+                'plan_id'             => $data['plan_id'],
+                'trial_ends_at'       => $trialEndsAt,
+                'subscription_status' => 'trialing',
             ]);
+
+            $openHours = $data['open_hours'] ?? [];
+
+            if (!empty($openHours)) {
+                foreach ($openHours as $item) {
+                    $restaurant->openHours()->create([
+                        'week_day'  => $item['week_day'],
+                        'opens_at'  => $item['from'] ?? null,
+                        'closes_at' => $item['to'] ?? null,
+                        'is_closed' => $item['is_closed']
+                            ?? (empty($item['from']) && empty($item['to'])),
+                    ]);
+                }
+            }
 
             $kitchenIds = $data['type_kitchen_ids'] ?? [];
             if (!empty($data['type_kitchen_custom'])) {
