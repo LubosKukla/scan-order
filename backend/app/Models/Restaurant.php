@@ -10,10 +10,6 @@ class Restaurant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ico',
-        'dic',
-        'dic_dph',
-        'iban',
         'is_active',
         'name',
         'name_boss',
@@ -22,7 +18,7 @@ class Restaurant extends Model
         'logo_path',
         'address_id',
         'user_id',
-        'pocet_stolov',
+        'number_of_tables',
     ];
 
     public function address()
@@ -68,5 +64,10 @@ class Restaurant extends Model
     public function kitchens()
     {
         return $this->belongsToMany(Type_kitchen::class, 'restaurant_type_kitchen');
+    }
+
+    public function restaurantBilling()
+    {
+        $this->hasOne(Restaurant_billing::class);
     }
 }

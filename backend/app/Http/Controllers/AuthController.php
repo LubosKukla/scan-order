@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Address;
 use App\Models\Customer;
 use App\Models\Restaurant;
+use App\Models\Restaurant_billing;
 use App\Models\Type_kitchen;
 use App\Models\Type_restaurant;
 use App\Models\User;
@@ -81,6 +82,17 @@ class AuthController extends Controller
 
             //este treba doplnit otvaracie hodiny 
             //doplnit description, logo a platbu predvolenu
+
+            'open_hours' => ['nullable', 'array'],
+            'open_hours.*' => ['time'],
+
+            'description' => ['nullable', 'string', 'max:500'],
+            //Este treba dokoncit aj nahravanie na ftp loga
+            'logo_path' => ['nullable', 'string'],
+
+            'plan_id' => ['required', 'integer'],
+
+            'number_tables' => ['nullable', 'integer']
         ]);
 
         $user = null;
@@ -120,6 +132,17 @@ class AuthController extends Controller
                 'name' => $data['name'],
                 'name_boss' => $data['name_boss'] ?? null,
                 'type_restaurant_id' => $typeRestaurantId,
+                'description' => $data['description'] ?? null,
+                'number_of_tables' => $data['number_of_tables'] ?? null,
+            ]);
+
+            $restaurantId = $restaurant->id;
+
+            $restaurantBilling = Restaurant_billing::create([
+                'restaurant_id' => $restaurantId,
+                'plan_id' => $data['plan_id'],
+                //este treba doplnit trial_ends_at
+                //subsription_status
             ]);
 
             $kitchenIds = $data['type_kitchen_ids'] ?? [];

@@ -16,16 +16,12 @@ return new class extends Migration
             $table->foreignId('address_id')->nullable()->constrained('addresses')->nullOnDelete();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('type_restaurant_id')->nullable()->constrained('type_restaurants')->nullOnDelete();
-            $table->string('ico')->nullable();
-            $table->string('dic')->nullable();
-            $table->string('dic_dph')->nullable();
-            $table->string('iban')->nullable();
             $table->boolean('is_active')->nullable();
             $table->string('name')->nullable();
             $table->string('name_boss')->nullable();
             $table->string('description')->nullable();
             $table->string('logo_path')->nullable();
-            $table->integer('pocet_stolov')->nullable();
+            $table->integer('number_of_tables')->nullable();
             $table->timestamps();
         });
     }
