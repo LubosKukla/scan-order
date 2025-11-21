@@ -89,7 +89,7 @@ class AuthController extends Controller
 
             'description' => ['nullable', 'string', 'max:500'],
             //Este treba dokoncit aj nahravanie na ftp loga
-            'logo_path' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
 
             'plan_id' => ['required', 'integer', 'exists:plans,id'],
 
@@ -97,8 +97,13 @@ class AuthController extends Controller
         ]);
 
         $user = null;
+        $logoPath = null;
 
-        DB::transaction(function () use ($request, $data, &$user) {
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('logos', 'public');
+        }
+
+        DB::transaction(function () use ($request, $data, &$user, $logoPath) {
 
             $user = User::create([
                 'email' => $data['email'],
@@ -135,6 +140,7 @@ class AuthController extends Controller
                 'type_restaurant_id' => $typeRestaurantId,
                 'description' => $data['description'] ?? null,
                 'number_of_tables' => $data['number_of_tables'] ?? null,
+                'logo_path' => $logoPath,
             ]);
 
             $restaurantId = $restaurant->id;
