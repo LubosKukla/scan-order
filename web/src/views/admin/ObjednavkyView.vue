@@ -2,7 +2,7 @@
   <section class="space-y-8">
     <AdminPageHeader title="Objednávky" subtitle="Spravujte a sledujte všetky objednávky reštaurácie v reálnom čase.">
       <template #actions>
-        <BaseButton icon="add">Pridať objednávku</BaseButton>
+        <BaseButton icon="add" @click="openCreateModal">Pridať objednávku</BaseButton>
       </template>
     </AdminPageHeader>
 
@@ -82,7 +82,7 @@
                 <OrderTypeBadge :type="order.type" />
               </td>
               <td class="padding-item">
-                <div class="flex items-center gap-2 text-sm">
+                <div class="flex items-center gap-2 text-sm cursor-pointer select-none" @dblclick="addFiveMinutes(order)">
                   <font-awesome-icon :icon="faClock" class="text-deep/50" />
                   <span>{{ formatTime(order.remainingSeconds) }}</span>
                 </div>
@@ -134,7 +134,7 @@
             <p class="text-xs text-deep/60">{{ order.location }}</p>
           </div>
           <OrderTypeBadge :type="order.type" />
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 cursor-pointer select-none" @dblclick="addFiveMinutes(order)">
             <font-awesome-icon :icon="faClock" class="text-deep/80" />
             <span class="text-sm text-deep/80">{{ formatTime(order.remainingSeconds) }}</span>
           </div>
@@ -160,6 +160,147 @@
         </p>
       </div>
     </BaseCard>
+
+    <BaseModal v-model="createModalVisible" title="Pridať novú objednávku">
+      <div class="space-y-5">
+        <p class="text-sm text-deep/70">Vytvorte objednávku manuálne.</p>
+
+        <div class="space-y-2">
+          <p class="text-sm font-semibold text-deep/70">Typ objednávky</p>
+          <div class="grid grid-cols-3 gap-3">
+            <button
+              v-for="type in orderTypeOptions"
+              :key="type.key"
+              type="button"
+              class="rounded-xl cursor-pointer border-2 px-4 py-3 text-sm font-semibold transition flex flex-col items-center gap-1 hover:border-primary/30 hover:bg-primary/10 hover:text-primary'"
+              :class="
+                createForm.type === type.key ? 'border-primary bg-primary/10 text-primary' : 'border-ink text-deep/70'
+              "
+              @click="createForm.type = type.key"
+            >
+              <font-awesome-icon :icon="type.icon" class="text-xl" />
+              {{ type.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-3">
+          <BaseInput label="Meno zákazníka" v-model="createForm.customer" placeholder="Zadajte meno" />
+          <BaseInput label="Telefón" v-model="createForm.phone" placeholder="+421 xxx xxx xxx" />
+          <BaseSelect
+            label="Stôl"
+            required
+            v-model="createForm.table"
+            :options="tableOptions"
+            placeholder="Vyberte stôl"
+          />
+          <BaseSelect
+            label="Spôsob platby"
+            v-model="createForm.payment"
+            :options="paymentOptions"
+            placeholder="Vyberte platbu"
+          />
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-deep">
+              Pridať položku
+              <span class="text-danger">*</span>
+            </p>
+            <BaseButton variant="secondary" :disabled="!canAddItem" @click="addSelectedItemToForm">Pridať</BaseButton>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="category in menuCategories"
+              :key="category.key"
+              type="button"
+              class="px-4 py-2 rounded-lg cursor-pointer text-xs font-semibold transition hover:bg-deep/20"
+              :class="selectedCategoryKey === category.key ? 'bg-primary text-white' : 'bg-ink text-deep/70'"
+              @click="selectCategory(category.key)"
+            >
+              {{ category.label }}
+            </button>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-2">
+            <button
+              v-for="item in menuItemsForCategory"
+              :key="item.id"
+              type="button"
+              class="rounded-xl cursor-pointer border px-4 py-3 text-left text-sm transition hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+              :class="selectedMenuItem?.id === item.id ? 'border-primary bg-primary/10' : 'border-ink bg-white'"
+              @click="selectMenuItem(item)"
+            >
+              <p class="font-semibold text-deep">{{ item.name }}</p>
+              <p class="text-xs text-deep/60">{{ formatAmount(item.price) }}</p>
+            </button>
+          </div>
+
+          <div v-if="selectedMenuItem" class="space-y-3 rounded-2xl border border-ink p-4 bg-white">
+            <p class="text-sm font-semibold text-deep">{{ selectedMenuItem.name }}</p>
+            <BaseSelect
+              v-if="variantOptions.length"
+              label="Varianta"
+              :options="variantOptions"
+              v-model="selectedVariantId"
+            />
+            <div v-if="selectedMenuItem.removables?.length" class="space-y-2">
+              <p class="text-xs font-semibold text-deep/70">Odstrániť</p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="ingredient in selectedMenuItem.removables"
+                  :key="ingredient.id"
+                  type="button"
+                  class="px-3 py-1 rounded-full border text-xs"
+                  :class="
+                    selectedRemovals.includes(ingredient.id)
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-ink text-deep/70'
+                  "
+                  @click="toggleRemoval(ingredient.id)"
+                >
+                  {{ ingredient.label }}
+                </button>
+              </div>
+            </div>
+            <div v-if="selectedMenuItem.extras?.length" class="space-y-2">
+              <p class="text-xs font-semibold text-deep/70">Pridať</p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="extra in selectedMenuItem.extras"
+                  :key="extra.id"
+                  type="button"
+                  class="px-3 py-1 rounded-full border text-xs"
+                  :class="
+                    selectedExtras.includes(extra.id)
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-ink text-deep/70'
+                  "
+                  @click="toggleExtra(extra.id)"
+                >
+                  {{ extra.label }} +{{ formatAmount(extra.price) }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <OrderItemsTable
+          :items="createForm.items"
+          :total="createFormTotal"
+          title="Vybrané položky"
+          removable
+          @remove="removeFormItem"
+        />
+
+        <BaseTextarea label="Poznámka" v-model="createForm.note" placeholder="Poznámka k objednávke..." rows="3" />
+      </div>
+
+      <template #footer>
+        <BaseButton variant="secondary" @click="closeCreateModal">Zrušiť</BaseButton>
+        <BaseButton icon="add" :disabled="!canCreateOrder" @click="createOrder">Vytvoriť objednávku</BaseButton>
+      </template>
+    </BaseModal>
 
     <BaseModal v-model="previewVisible" :title="previewTitle">
       <div v-if="selectedOrder" class="space-y-5">
@@ -245,11 +386,21 @@
 <script>
 //generated by AI
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBell, faBolt, faCircleCheck, faEuroSign, faClock } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBell,
+  faBolt,
+  faCircleCheck,
+  faEuroSign,
+  faClock,
+  faUtensils,
+  faBox,
+  faMotorcycle,
+} from '@fortawesome/free-solid-svg-icons';
 import AdminPageHeader from '@/components/layout/funkcionality/AdminPageHeader.vue';
 import BaseCard from '@/components/global/containers/BaseCard.vue';
 import BaseInput from '@/components/global/inputs/BaseInput.vue';
 import BaseSelect from '@/components/global/inputs/BaseSelect.vue';
+import BaseTextarea from '@/components/global/inputs/BaseTextarea.vue';
 import BaseButton from '@/components/global/buttons/BaseButton.vue';
 import BaseModal from '@/components/global/containers/BaseModal.vue';
 import OrderTypeBadge from '@/components/global/orders/OrderTypeBadge.vue';
@@ -332,6 +483,96 @@ const SAMPLE_ORDERS = [
   },
 ];
 
+const MENU_CATEGORIES = [
+  {
+    key: 'mains',
+    label: 'Hlavné jedlá',
+    items: [
+      {
+        id: 'gnocchi',
+        name: 'Gnocchi so špenátom',
+        price: 12.5,
+        variants: [
+          { id: 'medium', label: 'Medium', price: 0 },
+          { id: 'large', label: 'Large +2 €', price: 2 },
+        ],
+        removables: [
+          { id: 'parmesan', label: 'Parmezán' },
+          { id: 'garlic', label: 'Cesnak' },
+        ],
+        extras: [
+          { id: 'extraSauce', label: 'Extra omáčka', price: 1.5 },
+          { id: 'bacon', label: 'Slanina', price: 2 },
+        ],
+      },
+      {
+        id: 'steak',
+        name: 'Steak s omáčkou',
+        price: 24.5,
+        variants: [
+          { id: 'rare', label: 'Rare', price: 0 },
+          { id: 'medium', label: 'Medium', price: 0 },
+          { id: 'well', label: 'Well done', price: 0 },
+        ],
+        removables: [
+          { id: 'pepper', label: 'Korenie' },
+          { id: 'butter', label: 'Bylinkové maslo' },
+        ],
+        extras: [
+          { id: 'extraFries', label: 'Extra hranolky', price: 2.5 },
+          { id: 'grilledVeg', label: 'Grilovaná zelenina', price: 3 },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'dessert',
+    label: 'Dezerty',
+    items: [
+      {
+        id: 'tiramisu',
+        name: 'Tiramisu',
+        price: 6.5,
+        variants: [],
+        removables: [],
+        extras: [{ id: 'extraCocoa', label: 'Extra kakao', price: 0.5 }],
+      },
+      {
+        id: 'cheesecake',
+        name: 'Cheesecake',
+        price: 7.5,
+        variants: [
+          { id: 'blueberry', label: 'Čučoriedkový', price: 0 },
+          { id: 'saltedCaramel', label: 'Slaný karamel', price: 1 },
+        ],
+        removables: [],
+        extras: [{ id: 'whippedCream', label: 'Šľahačka', price: 0.5 }],
+      },
+    ],
+  },
+];
+
+const ORDER_TYPE_OPTIONS = [
+  { key: 'dineIn', label: 'Na mieste', icon: faUtensils },
+  { key: 'takeout', label: 'Odber', icon: faBox },
+  { key: 'delivery', label: 'Donáška', icon: faMotorcycle },
+];
+
+const TABLE_OPTIONS = [
+  { label: 'Stôl 1', value: 'table1' },
+  { label: 'Stôl 2', value: 'table2' },
+  { label: 'Stôl 3', value: 'table3' },
+  { label: 'Stôl 4 - terasa', value: 'table4' },
+  { label: 'Výdajné okno', value: 'takeout' },
+  { label: 'Donáška', value: 'delivery' },
+];
+
+const PAYMENT_OPTIONS = [
+  { label: 'Hotovosť', value: 'cash' },
+  { label: 'Karta', value: 'card' },
+  { label: 'Online platba', value: 'online' },
+];
+
 const STATUS_OPTIONS = [
   { label: 'Všetky objednávky', value: 'all' },
   { label: 'Nové', value: 'new' },
@@ -355,6 +596,7 @@ export default {
     BaseCard,
     BaseInput,
     BaseSelect,
+    BaseTextarea,
     BaseButton,
     BaseModal,
     OrderTypeBadge,
@@ -384,6 +626,25 @@ export default {
       selectedOrder: null,
       statusUpdate: 'new',
       deleteModalVisible: false,
+      createModalVisible: false,
+      createForm: {
+        type: 'dineIn',
+        customer: '',
+        phone: '',
+        table: '',
+        payment: 'online',
+        note: '',
+        items: [],
+      },
+      menuCategories: MENU_CATEGORIES,
+      selectedCategoryKey: MENU_CATEGORIES[0].key,
+      selectedMenuItem: null,
+      selectedVariantId: null,
+      selectedExtras: [],
+      selectedRemovals: [],
+      orderTypeOptions: ORDER_TYPE_OPTIONS,
+      tableOptions: TABLE_OPTIONS,
+      paymentOptions: PAYMENT_OPTIONS,
     };
   },
   computed: {
@@ -455,6 +716,30 @@ export default {
       const total = 1800;
       return Math.min(100, Math.max(0, (this.selectedOrder.remainingSeconds / total) * 100));
     },
+    selectedCategory() {
+      return (
+        this.menuCategories.find((category) => category.key === this.selectedCategoryKey) || this.menuCategories[0]
+      );
+    },
+    menuItemsForCategory() {
+      return this.selectedCategory?.items || [];
+    },
+    variantOptions() {
+      if (!this.selectedMenuItem?.variants?.length) return [];
+      return this.selectedMenuItem.variants.map((variant) => ({
+        label: variant.label,
+        value: variant.id,
+      }));
+    },
+    canAddItem() {
+      return Boolean(this.selectedMenuItem && (this.selectedMenuItem.variants?.length ? this.selectedVariantId : true));
+    },
+    createFormTotal() {
+      return this.createForm.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    },
+    canCreateOrder() {
+      return Boolean(this.createForm.table && this.createForm.items.length);
+    },
   },
   methods: {
     tabClass(key) {
@@ -488,6 +773,111 @@ export default {
     adjustTime(seconds) {
       if (!this.selectedOrder) return;
       this.selectedOrder.remainingSeconds = Math.max(0, (this.selectedOrder.remainingSeconds || 0) + seconds);
+    },
+    addFiveMinutes(order) {
+      const updatedSeconds = Math.max(0, (order.remainingSeconds || 0) + 300);
+      order.remainingSeconds = updatedSeconds;
+      if (this.selectedOrder?.id === order.id) {
+        this.selectedOrder.remainingSeconds = updatedSeconds;
+      }
+    },
+    openCreateModal() {
+      this.createModalVisible = true;
+    },
+    closeCreateModal() {
+      this.createModalVisible = false;
+      this.resetCreateForm();
+    },
+    resetCreateForm() {
+      this.createForm = {
+        type: 'dineIn',
+        customer: '',
+        phone: '',
+        table: '',
+        payment: 'online',
+        note: '',
+        items: [],
+      };
+      this.selectedCategoryKey = this.menuCategories[0].key;
+      this.selectedMenuItem = null;
+      this.selectedVariantId = null;
+      this.selectedExtras = [];
+      this.selectedRemovals = [];
+    },
+    selectCategory(key) {
+      this.selectedCategoryKey = key;
+      this.selectedMenuItem = null;
+      this.selectedVariantId = null;
+      this.selectedExtras = [];
+      this.selectedRemovals = [];
+    },
+    selectMenuItem(item) {
+      this.selectedMenuItem = item;
+      this.selectedVariantId = item.variants?.[0]?.id || null;
+      this.selectedExtras = [];
+      this.selectedRemovals = [];
+    },
+    toggleExtra(id) {
+      if (this.selectedExtras.includes(id)) {
+        this.selectedExtras = this.selectedExtras.filter((extra) => extra !== id);
+      } else {
+        this.selectedExtras = [...this.selectedExtras, id];
+      }
+    },
+    toggleRemoval(id) {
+      if (this.selectedRemovals.includes(id)) {
+        this.selectedRemovals = this.selectedRemovals.filter((item) => item !== id);
+      } else {
+        this.selectedRemovals = [...this.selectedRemovals, id];
+      }
+    },
+    addSelectedItemToForm() {
+      if (!this.canAddItem) return;
+      const basePrice = this.selectedMenuItem.price;
+      const variant = this.selectedMenuItem.variants?.find((variant) => variant.id === this.selectedVariantId);
+      const extras = this.selectedExtras
+        .map((id) => this.selectedMenuItem.extras?.find((extra) => extra.id === id))
+        .filter(Boolean);
+      const removed = this.selectedRemovals
+        .map((id) => this.selectedMenuItem.removables?.find((item) => item.id === id)?.label)
+        .filter(Boolean);
+      const extrasPrice = extras.reduce((sum, extra) => sum + extra.price, 0);
+      const price = basePrice + (variant?.price || 0) + extrasPrice;
+      this.createForm.items.push({
+        id: `${this.selectedMenuItem.id}-${Date.now()}`,
+        name: this.selectedMenuItem.name,
+        variant: variant?.label || null,
+        extras: extras.map((extra) => extra.label),
+        removed,
+        quantity: 1,
+        price,
+      });
+      this.selectedMenuItem = null;
+      this.selectedVariantId = null;
+      this.selectedExtras = [];
+      this.selectedRemovals = [];
+    },
+    removeFormItem(index) {
+      this.createForm.items.splice(index, 1);
+    },
+    createOrder() {
+      if (!this.canCreateOrder) return;
+      const nextId = (Number(this.orders[0]?.id || '10000') + 1).toString();
+      const newOrder = {
+        id: nextId,
+        customer: this.createForm.customer,
+        location: this.createForm.table,
+        type: this.createForm.type,
+        status: 'new',
+        remainingSeconds: 0,
+        total: this.createFormTotal,
+        createdAt: new Date().toISOString(),
+        payment:
+          this.paymentOptions.find((option) => option.value === this.createForm.payment)?.label || 'Online platba',
+        items: this.createForm.items.map((item) => ({ ...item })),
+      };
+      this.orders = [newOrder, ...this.orders];
+      this.closeCreateModal();
     },
     openDeleteModal(order) {
       this.selectedOrder = order;
