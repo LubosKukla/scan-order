@@ -32,22 +32,24 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'accept_gdpr' => ['required', 'accepted']
         ]);
+        DB::transaction(function () use ($request, $credentials, &$user) {
+            try {
+                $user = User::create([
+                    'email' => $credentials['email'],
+                    'password' => Hash::make($credentials['password']),
+                    'accept_gdpr' => $request->boolean('accept_gdpr'),
+                ]);
 
-        try {
-            $user = User::create([
-                'email' => $credentials['email'],
-                'password' => Hash::make($credentials['password']),
-                'accept_gdpr' => $request->boolean('accept_gdpr'),
-            ]);
+                Customer::create([
+                    'user_id' => $user->id,
+                    'name' => $credentials['name'],
+                    'surname' => $credentials['surname'],
+                ]);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Chyba pri registrácii používateľa'], 500);
+            }
+        });
 
-            Customer::create([
-                'user_id' => $user->id,
-                'name' => $credentials['name'],
-                'surname' => $credentials['surname'],
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Chyba pri registrácii používateľa'], 500);
-        }
 
 
 
