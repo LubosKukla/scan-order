@@ -15,7 +15,7 @@
       />
       <button
         type="button"
-        class="flex w-full items-center justify-between rounded-xl border border-ink/20 bg-ink/5 px-4 py-3 text-sm font-semibold text-deep transition hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
+        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-ink/20 bg-ink/5 px-4 py-3 text-sm font-semibold text-deep transition hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
         :disabled="disabled"
         @click="triggerInput"
       >
