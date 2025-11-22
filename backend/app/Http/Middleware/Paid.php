@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Restaurant;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -14,10 +15,25 @@ class Paid
             abort(403, 'Only restaurant accounts can access this resource.');
         }
 
-        // Ak máš viac reštaurácií, vyber si správnu podľa parametra,
-        // tu beriem prvú.
-        $restaurant = $user->restaurants()->with('restaurantBilling')->first();
-        if (! $restaurant || ! $restaurant->restaurantBilling) {
+        // Získať ID reštaurácie z route parametra alebo z request parametra
+        $restaurantId = null;
+        $routeRestaurant = $request->route('restaurant');
+        if ($routeRestaurant instanceof Restaurant) {
+            $restaurantId = $routeRestaurant->id;
+        } else {
+            $restaurantId = $request->route('restaurant_id') ?? $request->input('restaurant_id');
+        }
+
+        $query = $user->restaurants()->with('restaurantBilling');
+        if ($restaurantId) {
+            $query->whereKey($restaurantId);
+        }
+        $restaurant = $query->first();
+
+        if (! $restaurant) {
+            return response()->json(['message' => 'Restaurant not found for this user.'], 403);
+        }
+        if (! $restaurant->restaurantBilling) {
             return response()->json(['message' => 'Billing record missing.'], 402);
         }
 
@@ -30,7 +46,7 @@ class Paid
                 'message' => 'Subscription required.',
                 'trial_ends_at' => $billing->trial_ends_at,
                 'subscription_status' => $billing->subscription_status,
-            ], 402); // Payment Required
+            ], 402);
         }
 
         return $next($request);

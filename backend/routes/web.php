@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::post('/register/customer', [AuthController::class, 'registerCustomer']);
+Route::post('/register/customer', [AuthController::class, 'registerCustomer'])->withoutMiddleware([VerifyCsrfToken::class]);;
 Route::post('/register/restaurant', [AuthController::class, 'registerRestaurant']);
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');

@@ -32,8 +32,10 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'accept_gdpr' => ['required', 'accepted']
         ]);
-        DB::transaction(function () use ($request, $credentials, &$user) {
-            try {
+        $user = null;
+        try {
+            DB::transaction(function () use ($request, $credentials, &$user) {
+
                 $user = User::create([
                     'email' => $credentials['email'],
                     'password' => Hash::make($credentials['password']),
@@ -45,11 +47,10 @@ class AuthController extends Controller
                     'name' => $credentials['name'],
                     'surname' => $credentials['surname'],
                 ]);
-            } catch (\Exception $e) {
-                return response()->json(['message' => 'Chyba pri registrácii používateľa'], 500);
-            }
-        });
-
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Chyba pri registrácii používateľa'], 500);
+        }
 
 
 
@@ -101,87 +102,92 @@ class AuthController extends Controller
         $user = null;
         $logoPath = null;
 
+
+        try {
+            DB::transaction(function () use ($request, $data, &$user, $logoPath) {
+
+                $user = User::create([
+                    'email' => $data['email'],
+                    'password' => Hash::make($data['password']),
+                    'accept_gdpr' => $request->boolean('accept_gdpr'),
+                    'phone' => $data['phone'],
+                ]);
+
+                $address = Address::create([
+                    'street' => $data['street'],
+                    'number_of_building' => $data['number_of_building'],
+                    'PSC' => $data['PSC'],
+                    'city' => $data['city'],
+                ]);
+
+                $typeRestaurantId = null;
+
+                if (!empty($data['type_restaurant_id'])) {
+                    // vybral existujúci typ
+                    $typeRestaurantId = $data['type_restaurant_id'];
+                } elseif (!empty($data['type_restaurant_custom'])) {
+                    // zadal nový typ – uložíme ho do tabuľky Type_restaurant
+                    $typeRestaurant = Type_restaurant::firstOrCreate([
+                        'type' => $data['type_restaurant_custom'],
+                    ]);
+                    $typeRestaurantId = $typeRestaurant->id;
+                }
+
+                $restaurant = Restaurant::create([
+                    'user_id' => $user->id,
+                    'address_id' => $address->id,
+                    'name' => $data['name'],
+                    'name_boss' => $data['name_boss'] ?? null,
+                    'type_restaurant_id' => $typeRestaurantId,
+                    'description' => $data['description'] ?? null,
+                    'number_of_tables' => $data['number_of_tables'] ?? null,
+                    'logo_path' => $logoPath,
+                ]);
+
+                $restaurantId = $restaurant->id;
+
+                $trialEndsAt = now()->addMonths(3)->toDateString();
+
+                $restaurantBilling = Restaurant_billing::create([
+                    'restaurant_id'       => $restaurantId,
+                    'plan_id'             => $data['plan_id'],
+                    'trial_ends_at'       => $trialEndsAt,
+                    'subscription_status' => 'trialing',
+                ]);
+
+                $openHours = $data['open_hours'] ?? [];
+
+                if (!empty($openHours)) {
+                    foreach ($openHours as $item) {
+                        $restaurant->openHours()->create([
+                            'day_of_week'  => $item['day_of_week'],
+                            'open_time'  => $item['open_time'] ?? null,
+                            'close_time' => $item['close_time'] ?? null,
+                            'is_closed' => $item['is_closed']
+                                ?? (empty($item['open_time']) && empty($item['close_time'])),
+                        ]);
+                    }
+                }
+
+                $kitchenIds = $data['type_kitchen_ids'] ?? [];
+                if (!empty($data['type_kitchen_custom'])) {
+                    $typeKitchen = Type_kitchen::firstOrCreate([
+                        'type' => $data['type_kitchen_custom'],
+                    ]);
+                    $kitchenIds[] = $typeKitchen->id;
+                }
+
+                if (!empty($kitchenIds)) {
+                    $restaurant->kitchens()->sync($kitchenIds);
+                }
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Chyba pri registrácii reštaurácie'], 500);
+        }
+
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('logos', 'public');
         }
-
-        DB::transaction(function () use ($request, $data, &$user, $logoPath) {
-
-            $user = User::create([
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'accept_gdpr' => $request->boolean('accept_gdpr'),
-                'phone' => $data['phone'],
-            ]);
-
-            $address = Address::create([
-                'street' => $data['street'],
-                'number_of_building' => $data['number_of_building'],
-                'PSC' => $data['PSC'],
-                'city' => $data['city'],
-            ]);
-
-            $typeRestaurantId = null;
-
-            if (!empty($data['type_restaurant_id'])) {
-                // vybral existujúci typ
-                $typeRestaurantId = $data['type_restaurant_id'];
-            } elseif (!empty($data['type_restaurant_custom'])) {
-                // zadal nový typ – uložíme ho do tabuľky Type_restaurant
-                $typeRestaurant = Type_restaurant::firstOrCreate([
-                    'type' => $data['type_restaurant_custom'],
-                ]);
-                $typeRestaurantId = $typeRestaurant->id;
-            }
-
-            $restaurant = Restaurant::create([
-                'user_id' => $user->id,
-                'address_id' => $address->id,
-                'name' => $data['name'],
-                'name_boss' => $data['name_boss'] ?? null,
-                'type_restaurant_id' => $typeRestaurantId,
-                'description' => $data['description'] ?? null,
-                'number_of_tables' => $data['number_of_tables'] ?? null,
-                'logo_path' => $logoPath,
-            ]);
-
-            $restaurantId = $restaurant->id;
-
-            $trialEndsAt = now()->addMonths(3)->toDateString();
-
-            $restaurantBilling = Restaurant_billing::create([
-                'restaurant_id'       => $restaurantId,
-                'plan_id'             => $data['plan_id'],
-                'trial_ends_at'       => $trialEndsAt,
-                'subscription_status' => 'trialing',
-            ]);
-
-            $openHours = $data['open_hours'] ?? [];
-
-            if (!empty($openHours)) {
-                foreach ($openHours as $item) {
-                    $restaurant->openHours()->create([
-                        'day_of_week'  => $item['day_of_week'],
-                        'open_time'  => $item['open_time'] ?? null,
-                        'close_time' => $item['close_time'] ?? null,
-                        'is_closed' => $item['is_closed']
-                            ?? (empty($item['open_time']) && empty($item['close_time'])),
-                    ]);
-                }
-            }
-
-            $kitchenIds = $data['type_kitchen_ids'] ?? [];
-            if (!empty($data['type_kitchen_custom'])) {
-                $typeKitchen = Type_kitchen::firstOrCreate([
-                    'type' => $data['type_kitchen_custom'],
-                ]);
-                $kitchenIds[] = $typeKitchen->id;
-            }
-
-            if (!empty($kitchenIds)) {
-                $restaurant->kitchens()->sync($kitchenIds);
-            }
-        });
 
         Auth::login($user);
         $request->session()->regenerate();

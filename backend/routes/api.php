@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomerController;
+use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,8 +25,22 @@ Route::middleware('auth:sanctum')->group(function () {
     // Authenticated routes can be added here...
 });
 
-Route::group(['middleware' => ['auth:sanctum', 'paid', 'restaurant']], function () {});
 
-Route::group(['middleware' => ['auth:sanctum', 'customer']], function () {
-    // Customer-specific routes
-});
+
+Route::middleware(['auth:sanctum', 'customer'])
+    ->group(function () {
+        Route::get('/customers/{customer}', [CustomerController::class, 'show']);
+    });
+
+Route::middleware(['auth:sanctum', 'customer'])
+    ->prefix('customers/{customer}')
+    ->group(function () {
+        // Customer-specific routes
+
+    });
+
+Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
+    ->prefix('restaurants/{restaurant}')
+    ->group(function () {
+        // ďalšie reštauračné endpointy…
+    });
