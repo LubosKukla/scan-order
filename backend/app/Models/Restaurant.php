@@ -68,6 +68,6 @@ class Restaurant extends Model
 
     public function restaurantBilling()
     {
-        $this->hasOne(Restaurant_billing::class);
+        return $this->hasOne(Restaurant_billing::class);
     }
 }

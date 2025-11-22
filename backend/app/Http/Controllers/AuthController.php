@@ -73,18 +73,18 @@ class AuthController extends Controller
             'PSC' => ['required', 'string', 'max:20'],
             'city' => ['required', 'string', 'max:100'],
 
-            'type_restaurant_id'     => ['required_without:type_restaurant_custom', 'nullable', 'integer', 'exists:type_restaurant,id'],
+            'type_restaurant_id'     => ['required_without:type_restaurant_custom', 'nullable', 'integer', 'exists:type_restaurants,id'],
             'type_restaurant_custom' => ['required_without:type_restaurant_id', 'string', 'min:2', 'max:255'],
 
             'type_kitchen_ids'       => ['required_without:type_kitchen_custom', 'array'],
-            'type_kitchen_ids.*'     => ['integer', 'exists:type_kitchen,id'],
+            'type_kitchen_ids.*'     => ['integer', 'exists:type_kitchens,id'],
             'type_kitchen_custom'    => ['required_without:type_kitchen_ids', 'string', 'min:2', 'max:255'],
 
 
             'open_hours' => ['nullable', 'array'],
-            'open_hours.*.week_day'   => ['required', 'integer', 'between:1,7'],
-            'open_hours.*.from'       => ['nullable', 'date_format:H:i'],
-            'open_hours.*.to'         => ['nullable', 'date_format:H:i'],
+            'open_hours.*.day_of_week'   => ['required', 'integer', 'between:1,7'],
+            'open_hours.*.open_time'       => ['nullable', 'date_format:H:i'],
+            'open_hours.*.close_time'         => ['nullable', 'date_format:H:i'],
             'open_hours.*.is_closed'  => ['nullable', 'boolean'],
 
             'description' => ['nullable', 'string', 'max:500'],
@@ -93,7 +93,7 @@ class AuthController extends Controller
 
             'plan_id' => ['required', 'integer', 'exists:plans,id'],
 
-            'number_tables' => ['nullable', 'integer']
+            'number_of_tables' => ['nullable', 'integer']
         ]);
 
         $user = null;
@@ -159,11 +159,11 @@ class AuthController extends Controller
             if (!empty($openHours)) {
                 foreach ($openHours as $item) {
                     $restaurant->openHours()->create([
-                        'week_day'  => $item['week_day'],
-                        'opens_at'  => $item['from'] ?? null,
-                        'closes_at' => $item['to'] ?? null,
+                        'day_of_week'  => $item['day_of_week'],
+                        'open_time'  => $item['open_time'] ?? null,
+                        'close_time' => $item['close_time'] ?? null,
                         'is_closed' => $item['is_closed']
-                            ?? (empty($item['from']) && empty($item['to'])),
+                            ?? (empty($item['open_time']) && empty($item['close_time'])),
                     ]);
                 }
             }
