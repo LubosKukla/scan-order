@@ -1,23 +1,43 @@
 ﻿<template>
   <form class="space-y-1" @submit.prevent="handleSubmit">
-    <BaseSelect
-      :modelValue="form.restaurantType"
-      :options="restaurantTypes"
-      label="Typ reštaurácie"
-      placeholder="Vyberte typ"
-      :required="true"
-      :error="errors.restaurantType"
-      @update:modelValue="updateField('restaurantType', $event)"
-    />
-    <BaseSelect
-      :modelValue="form.cuisineType"
-      :options="cuisineTypes"
-      label="Typ kuchyne"
-      placeholder="Vyberte typ kuchyne"
-      :required="true"
-      :error="errors.cuisineType"
-      @update:modelValue="updateField('cuisineType', $event)"
-    />
+    <div class="space-y-1">
+      <BaseSelect
+        :modelValue="form.restaurantType"
+        :options="restaurantTypes"
+        label="Typ reštaurácie"
+        placeholder="Vyberte typ"
+        :required="true"
+        :error="errors.restaurantType"
+        @update:modelValue="updateField('restaurantType', $event)"
+      />
+      <BaseInput
+        v-if="form.restaurantType === 'Ostatné'"
+        :modelValue="form.otherRestaurantType"
+        label="Môj typ"
+        placeholder="Napíšte vlastný typ reštaurácie"
+        :error="errors.otherRestaurantType"
+        @update:modelValue="updateField('otherRestaurantType', $event)"
+      />
+    </div>
+    <div class="space-y-1">
+      <BaseSelect
+        :modelValue="form.cuisineType"
+        :options="cuisineTypes"
+        label="Typ kuchyne"
+        placeholder="Vyberte typ kuchyne"
+        :required="true"
+        :error="errors.cuisineType"
+        @update:modelValue="updateField('cuisineType', $event)"
+      />
+      <BaseInput
+        v-if="form.cuisineType === 'Ostatné'"
+        :modelValue="form.otherCuisineType"
+        label="Môj typ"
+        placeholder="Napíšte vlastný typ kuchyne"
+        :error="errors.otherCuisineType"
+        @update:modelValue="updateField('otherCuisineType', $event)"
+      />
+    </div>
 
     <div class="space-y-4">
       <BaseInput

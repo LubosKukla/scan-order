@@ -106,6 +106,8 @@ export default {
         acceptedTerms: false,
         restaurantType: '',
         cuisineType: '',
+        otherRestaurantType: '',
+        otherCuisineType: '',
         street: '',
         city: '',
         zip: '',
@@ -125,14 +127,16 @@ export default {
         acceptedTerms: '',
         restaurantType: '',
         cuisineType: '',
+        otherRestaurantType: '',
+        otherCuisineType: '',
         street: '',
         city: '',
         zip: '',
         tables: '',
         selectedPlan: '',
       },
-      restaurantTypes: ['Reštaurácia', 'Bistro', 'Kaviareň', 'Bar'],
-      cuisineTypes: ['Európska', 'Ázijská', 'Talianska', 'Mexická'],
+      restaurantTypes: ['Reštaurácia', 'Bistro', 'Kaviareň', 'Bar', 'Ostatné'],
+      cuisineTypes: ['Európska', 'Ázijská', 'Talianska', 'Mexická', 'Ostatné'],
       days: [
         { key: 'monday', label: 'Pondelok' },
         { key: 'tuesday', label: 'Utorok' },
@@ -181,6 +185,14 @@ export default {
       if (field === 'password' || field === 'passwordConfirm') {
         this.revalidateField('passwordConfirm');
       }
+      if (field === 'restaurantType' && value !== 'Ostatné') {
+        this.form.otherRestaurantType = '';
+        this.errors.otherRestaurantType = '';
+      }
+      if (field === 'cuisineType' && value !== 'Ostatné') {
+        this.form.otherCuisineType = '';
+        this.errors.otherCuisineType = '';
+      }
     },
     updateOpeningHours({ day, key, value }) {
       if (this.form.openingHours[day]) {
@@ -218,6 +230,10 @@ export default {
         case 'street':
         case 'city':
           return normalized ? '' : 'Toto pole je povinné.';
+        case 'otherRestaurantType':
+          return this.form.restaurantType === 'Ostatné' && !normalized ? 'Uveďte vlastný typ reštaurácie.' : '';
+        case 'otherCuisineType':
+          return this.form.cuisineType === 'Ostatné' && !normalized ? 'Uveďte vlastný typ kuchyne.' : '';
         case 'zip':
           if (!normalized) return 'PSČ je povinné.';
           return ZIP_REGEX.test(normalized) ? '' : 'Zadajte platné PSČ.';
@@ -245,7 +261,10 @@ export default {
       return this.validateFields(['restaurantName', 'email', 'phone', 'password', 'passwordConfirm', 'acceptedTerms']);
     },
     validateStepTwo() {
-      return this.validateFields(['restaurantType', 'cuisineType', 'street', 'city', 'zip']);
+      const fields = ['restaurantType', 'cuisineType', 'street', 'city', 'zip'];
+      if (this.form.restaurantType === 'Ostatné') fields.push('otherRestaurantType');
+      if (this.form.cuisineType === 'Ostatné') fields.push('otherCuisineType');
+      return this.validateFields(fields);
     },
     validateStepThree() {
       return this.validateFields(['selectedPlan']);
