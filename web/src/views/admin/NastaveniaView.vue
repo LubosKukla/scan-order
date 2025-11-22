@@ -29,8 +29,24 @@
           />
           <BaseInput v-model="profileForm.email" type="email" label="Email" placeholder="info@restauracia.sk" />
           <BaseInput v-model="profileForm.phone" label="Telefónne číslo" placeholder="+421 900 000 000" />
-          <BaseSelect v-model="profileForm.restaurantType" label="Typ reštaurácie" :options="restaurantTypeOptions" />
-          <BaseSelect v-model="profileForm.cuisine" label="Typ kuchyne" :options="cuisineOptions" />
+          <div class="space-y-1">
+            <BaseSelect v-model="profileForm.restaurantType" label="Typ reštaurácie" :options="restaurantTypeOptions" />
+            <BaseInput
+              v-if="profileForm.restaurantType === 'other'"
+              v-model="profileForm.otherRestaurantType"
+              label="Môj typ"
+              placeholder="Napíšte vlastný typ reštaurácie"
+            />
+          </div>
+          <div class="space-y-1">
+            <BaseSelect v-model="profileForm.cuisine" label="Typ kuchyne" :options="cuisineOptions" />
+            <BaseInput
+              v-if="profileForm.cuisine === 'other'"
+              v-model="profileForm.otherCuisine"
+              label="Môj typ"
+              placeholder="Napíšte vlastný typ kuchyne"
+            />
+          </div>
         </div>
 
         <BaseTextarea
@@ -150,7 +166,9 @@
             <p class="text-base font-semibold text-deep">Otváracie hodiny</p>
             <p class="text-sm text-deep/70">Nastavte prevádzkové hodiny reštaurácie</p>
           </div>
-          <BaseButton variant="secondary" @click="copyFirstDayToAll">Kopírovať na všetky dni</BaseButton>
+          <BaseButton variant="secondary" class="w-full md:w-auto" @click="copyFirstDayToAll">
+            Kopírovať na všetky dni
+          </BaseButton>
         </div>
 
         <div class="space-y-2">
@@ -336,6 +354,8 @@ export default {
         phone: '+421 900 000 000',
         restaurantType: 'restaurant',
         cuisine: 'slovak',
+        otherRestaurantType: '',
+        otherCuisine: '',
         billToCompany: false,
         company: {
           name: 'Reštaurácia U Jozefa s.r.o.',
@@ -366,12 +386,14 @@ export default {
         { label: 'Kaviareň', value: 'cafe' },
         { label: 'Catering', value: 'catering' },
         { label: 'Food truck', value: 'foodtruck' },
+        { label: 'Ostatné', value: 'other' },
       ],
       cuisineOptions: [
         { label: 'Slovenská', value: 'slovak' },
         { label: 'Talianska', value: 'italian' },
         { label: 'Ázijská', value: 'asian' },
         { label: 'Medzinárodná', value: 'international' },
+        { label: 'Ostatné', value: 'other' },
       ],
       planInfo: {
         name: 'Platba - Najlepšia voľba',
@@ -446,6 +468,8 @@ export default {
         phone: '+421 900 000 000',
         restaurantType: 'restaurant',
         cuisine: 'slovak',
+        otherRestaurantType: '',
+        otherCuisine: '',
         billToCompany: false,
         company: {
           name: 'Reštaurácia U lubosa a janka s.r.o.',
