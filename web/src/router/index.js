@@ -156,6 +156,12 @@ const routes = [
     component: () => import('../views/admin/NastaveniaView.vue'),
   },
   {
+    path: '/admin/predplatne',
+    name: 'admin-predplatne',
+    meta: { section: 'admin', title: 'Predplatne', requiresRole: 'admin' },
+    component: () => import('../views/admin/PredplatneView.vue'),
+  },
+  {
     path: '/admin/qr-kody',
     name: 'admin-qr-kody',
     meta: { section: 'admin', title: 'QR kódy', requiresRole: 'admin' },
