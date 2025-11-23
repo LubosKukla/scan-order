@@ -4,18 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
-    public function show(Request $request, $customerId)
+    public function show(Customer $customer)
     {
-        $customer = Customer::find($customerId);
-        if (!$customer) {
-            return response()->json(['message' => 'Customer not found'], 404);
+        $user = Auth::user();
+        if ($user->id !== $customer->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
-        // Logika na zobrazenie informácií o zákazníkovi
+
+        $customer->loadMissing([
+            'user',
+            'address',
+            'baskets',
+            'reviews',
+        ]);
         return response()->json([
-            'message' => "Zobrazenie informácií o zákazníkovi s ID: {$customerId}"
+            'customer' => $customer,
         ]);
     }
 }
