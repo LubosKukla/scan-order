@@ -39,7 +39,7 @@
         v-if="previewUrl"
         :src="previewUrl"
         alt="Náhľad jedla"
-        class="w-full rounded-2xl object-cover h-48 border border-ink/10"
+        class="w-full rounded-2xl object-cover h-48 border border-deep/10"
       />
 
       <BaseCard class="space-y-6">
@@ -69,7 +69,7 @@
         <div class="flex items-start justify-between gap-4">
           <div>
             <p class="font-semibold text-deep">Variant</p>
-            <p class="text-sm text-ink/60">#{{ index + 1 }}</p>
+            <p class="text-sm text-deep/60">#{{ index + 1 }}</p>
           </div>
           <button type="button" class="close-btn" @click="removeVariant(index)">&times;</button>
         </div>
@@ -103,35 +103,71 @@
     <div v-else-if="activeTab === 'addons'" class="space-y-4">
       <div class="flex flex-wrap items-center gap-4">
         <div>
-          <p class="text-sm text-deep">Prídavky, ktoré si zákazník môže objednať k jedlu.</p>
+          <p class="text-sm text-deep">Doplnky, ktoré si zákazník môže objednať k jedlu.</p>
         </div>
-        <BaseButton size="sm" class="ml-auto" icon="add" @click="addAddon">Pridať prídavok</BaseButton>
+        <BaseButton size="sm" class="ml-auto" icon="add" @click="addAddon">Pridať doplnok</BaseButton>
       </div>
 
-      <BaseCard v-for="(addon, index) in addons" :key="addon.id" class="space-y-3 border border-deep/10 shadow-2xs">
-        <div class="flex items-center justify-between gap-4">
-          <p class="font-semibold text-deep">Prídavok #{{ index + 1 }}</p>
-          <button type="button" class="close-btn" @click="removeAddon(index)">&times;</button>
-        </div>
+      <div class="space-y-3">
+        <p class="text-xs text-deep/70">
+          Testovacie dáta sú zoradené podľa kategórie (Nápoje, Dezerty, Prílohy).
+        </p>
 
-        <div class="grid gap-4 md:grid-cols-2">
-          <BaseInput label="Názov" v-model="addon.name" required placeholder="Extra syr" />
-          <BaseInput label="Cena (€)" v-model="addon.price" type="number" min="0" step="0.1" required />
-        </div>
+        <BaseCard
+          v-for="(addon, index) in addons"
+          :key="addon.id"
+          class="space-y-3 border border-deep/10 shadow-2xs"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <p class="text-sm font-semibold text-deep">Doplnok #{{ index + 1 }}</p>
+            <button type="button" class="close-btn" @click="removeAddon(index)">&times;</button>
+          </div>
 
-        <div class="flex items-center justify-between gap-4">
+          <BaseSelect
+            :model-value="addon.key"
+            @update:modelValue="(val) => handleAddonSelect(index, val)"
+            label="Vybrať doplnok"
+            :options="addonOptions"
+            option-label-key="label"
+            option-value-key="key"
+            placeholder="Vyberte doplnok"
+          />
+
+          <div class="grid gap-3 md:grid-cols-2">
+            <BaseInput label="Názov doplnku" v-model="addon.name" placeholder="Názov" />
+            <BaseInput label="Cena (€)" v-model="addon.price" type="number" min="0" step="0.1" />
+          </div>
+
           <BaseToggle
             v-model="addon.available"
-            label="Dostupné"
-            class="flex flex-row-reverse items-center gap-2 text-sm"
+            label="Viditeľné v ponuke"
+            class="flex flex-row-reverse items-center justify-between"
           />
-        </div>
-      </BaseCard>
 
-      <div v-if="!addons.length" class="p-3 text-center text-sm text-deep">
-        Zatiaľ ste nepridali žiadny prídavok. Kliknite na
-        <strong>Pridať prídavok</strong>
-        a vyplňte informácie.
+          <BaseCard class="space-y-2 border border-deep/10 bg-deep/5">
+            <p class="text-sm font-semibold text-deep">Náhľad</p>
+            <div class="aspect-[16/10] overflow-hidden rounded-xl border border-deep/10 bg-white">
+              <img
+                v-if="addon.image"
+                :src="addon.image"
+                :alt="addon.name"
+                class="h-full w-full object-cover"
+              />
+              <div v-else class="flex h-full items-center justify-center text-sm text-deep/50">Bez obrázka</div>
+            </div>
+            <div class="space-y-1 text-sm text-deep">
+              <p class="text-base font-semibold text-deep">{{ addon.name || 'Bez názvu' }}</p>
+              <p class="text-deep/70">
+                {{ addon.category || 'Kategória' }} · {{ addon.price ? formatPrice(addon.price) : '—' }}
+              </p>
+              <p class="text-deep/70">{{ addon.description || 'Bez popisu' }}</p>
+            </div>
+          </BaseCard>
+        </BaseCard>
+
+        <div v-if="!addons.length" class="p-3 text-center text-sm text-deep">
+          Kliknite na <strong>Pridať doplnok</strong> a vyberte položku pre tento produkt.
+        </div>
       </div>
     </div>
 
@@ -187,13 +223,55 @@ export default {
       },
       variants: [],
       addons: [],
+      availableAddons: [
+        {
+          key: 'kofola',
+          name: 'Kofola 0.5l',
+          category: 'Nápoje',
+          price: 2.4,
+          description: 'Chladená kofola, ideálna k menu.',
+          image: 'https://images.unsplash.com/photo-1527169402691-feff5539e52c?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          key: 'espresso',
+          name: 'Espresso',
+          category: 'Nápoje',
+          price: 1.8,
+          description: 'Krátka káva s plnou arómou.',
+          image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          key: 'colsalat',
+          name: 'Coleslaw',
+          category: 'Prílohy',
+          price: 1.5,
+          description: 'Jemný kapustový šalát so zálievkou.',
+          image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          key: 'hranolky',
+          name: 'Hranolky',
+          category: 'Prílohy',
+          price: 2.2,
+          description: 'Chrumkavé hranolky soľ/bez soli.',
+          image: 'https://images.unsplash.com/photo-1585238341986-2650c522f1c3?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+          key: 'cheesecake',
+          name: 'Cheesecake',
+          category: 'Dezerty',
+          price: 3.9,
+          description: 'Krémový cheesecake s ovocnou polevou.',
+          image: 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=800&q=80',
+        },
+      ],
       activeTab: 'basic',
       previewUrl: '',
       objectUrl: null,
       tabs: [
         { key: 'basic', label: 'Základné' },
         { key: 'variants', label: 'Varianty' },
-        { key: 'addons', label: 'Prídavky' },
+        { key: 'addons', label: 'Doplnky' },
       ],
     };
   },
@@ -214,6 +292,15 @@ export default {
         key: option.key,
         label: option.label,
       }));
+    },
+    addonOptions() {
+      return this.availableAddons
+        .slice()
+        .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))
+        .map((addon) => ({
+          key: addon.key,
+          label: `${addon.category} · ${addon.name} (${this.formatPrice(addon.price)})`,
+        }));
     },
   },
   watch: {
@@ -239,7 +326,7 @@ export default {
       if (this.activeTab === key) {
         return 'bg-primary/10 text-primary border border-primary/30';
       }
-      return ' text-deep hover:bg-ink/50 disabled:opacity-60 disabled:cursor-not-allowed';
+      return ' text-deep hover:bg-deep/5 disabled:opacity-60 disabled:cursor-not-allowed';
     },
     syncForm() {
       const source = this.item || {};
@@ -302,16 +389,38 @@ export default {
     createAddon(initial = {}) {
       return {
         id: initial.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        key: initial.key || '',
         name: initial.name || '',
         price: initial.price || '',
+        category: initial.category || 'Doplnky',
+        description: initial.description || '',
+        image: initial.image || '',
         available: initial.available !== undefined ? initial.available : true,
       };
     },
     addAddon() {
-      this.addons.push(this.createAddon());
+      const template = this.availableAddons[0] || {};
+      const newAddon = this.createAddon(template);
+      this.addons.push(newAddon);
     },
     removeAddon(index) {
       this.addons.splice(index, 1);
+    },
+    handleAddonSelect(index, key) {
+      const current = this.addons[index] || {};
+      const base = this.availableAddons.find((item) => item.key === key) || { key };
+      const updated = this.createAddon({
+        ...current,
+        ...base,
+        id: current.id,
+        key,
+        available: current.available,
+      });
+      this.addons.splice(index, 1, updated);
+    },
+    formatPrice(value) {
+      const number = Number(value) || 0;
+      return `${number.toFixed(2)} €`;
     },
   },
   beforeUnmount() {
