@@ -50,8 +50,6 @@
 import BaseCard from '../../components/global/containers/BaseCard.vue';
 import BaseInput from '../../components/global/inputs/BaseInput.vue';
 import BaseButton from '../../components/global/buttons/BaseButton.vue';
-import axios from 'axios';
-import user from '@/store/user';
 
 export default {
   name: 'AdminLoginView',
@@ -66,13 +64,9 @@ export default {
   },
   methods: {
     async submit() {
-      console.log('vypiš zmrde :>> ');
-      await axios.get('/sanctum/csrf-cookie');
       try {
-        const response = await axios.post('/login', this.form);
-        console.log('Prihlásenie úspešné:', response.data);
-
-        user.actions.setUser(this.$store, response.data.user);
+        const response = await this.$store.dispatch('user/prihlasenie', this.form);
+        console.log('Prihlásenie úspešné:', response);
       } catch (error) {
         console.error('Chyba pri prihlásení:', error);
       }
