@@ -51,7 +51,7 @@ function notify(messageOrPayload, maybeOptions = {}) {
   const snackbar = {
     id: ++seed,
     message: payload.message || '',
-    icon: payload.icon || 'check',
+    icon: payload.icon || null,
     variant: payload.variant || 'success',
     duration: typeof payload.duration === 'number' ? payload.duration : DEFAULT_DURATION,
     renderKey: nextRenderKey(),
