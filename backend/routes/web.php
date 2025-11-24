@@ -19,8 +19,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::post('/register/customer', [AuthController::class, 'registerCustomer'])->withoutMiddleware([VerifyCsrfToken::class]);;
-Route::post('/register/restaurant', [AuthController::class, 'registerRestaurant']);
+Route::post('/register/customer', [AuthController::class, 'registerCustomer'])
+    ->middleware('throttle:register');
 
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/register/restaurant', [AuthController::class, 'registerRestaurant'])
+    ->middleware('throttle:register');
+
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:login')
+    ->name('login');
 Route::post('/logout', [AuthController::class, 'logout']);
