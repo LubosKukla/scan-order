@@ -7,7 +7,7 @@
         <p class="text-sm text-deep/70">Prihláste sa do svojho účtu</p>
       </div>
 
-      <form class="mt-8 space-y-6" @submit.prevent="submit">
+      <form class="mt-8 space-y-6" @submit.prevent="submit()">
         <div class="mb-1">
           <BaseInput id="email" v-model="form.email" type="email" placeholder="vas.email@priklad.sk" label="Email" />
         </div>
@@ -25,7 +25,7 @@
           </router-link>
         </div>
 
-        <BaseButton icon="login" class="w-full justify-center">Prihlásiť sa</BaseButton>
+        <BaseButton icon="login" type="submit" class="w-full justify-center">Prihlásiť sa</BaseButton>
 
         <div class="relative text-center text-sm text-deep/60 pt-4">
           <div class="flex items-center gap-4">
@@ -50,6 +50,8 @@
 import BaseCard from '../../components/global/containers/BaseCard.vue';
 import BaseInput from '../../components/global/inputs/BaseInput.vue';
 import BaseButton from '../../components/global/buttons/BaseButton.vue';
+import axios from 'axios';
+import user from '@/store/user';
 
 export default {
   name: 'AdminLoginView',
@@ -63,8 +65,17 @@ export default {
     };
   },
   methods: {
-    submit() {
-      this.$emit('login', { ...this.form });
+    async submit() {
+      console.log('vypiš zmrde :>> ');
+      await axios.get('/sanctum/csrf-cookie');
+      try {
+        const response = await axios.post('/login', this.form);
+        console.log('Prihlásenie úspešné:', response.data);
+
+        user.actions.setUser(response.data.user);
+      } catch (error) {
+        console.error('Chyba pri prihlásení:', error);
+      }
     },
   },
 };
