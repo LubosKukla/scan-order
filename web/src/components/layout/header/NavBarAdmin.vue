@@ -14,32 +14,35 @@
     </div>
 
     <nav class="flex-1 px-3 py-5 space-y-2" aria-label="Admin navigacia">
-      <router-link
-        v-for="item in navItems"
-        :key="item.routeName"
-        :to="{ name: item.routeName }"
-        class="flex items-center rounded-xl text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-        :class="linkClasses(item.routeName)"
-      >
-        <span
-          class="flex h-10 w-10 items-center justify-center rounded-xl text-base transition-colors duration-200"
-          :class="isActive(item.routeName) ? 'bg-white/20 text-white' : 'bg-white/5 text-ink group-hover:text-white'"
+      <template v-for="item in navItems">
+        <router-link
+          v-if="!item.type"
+          :key="item.routeName"
+          :to="{ name: item.routeName }"
+          class="flex items-center rounded-xl text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+          :class="[linkClasses(item.routeName)]"
         >
-          <font-awesome-icon :icon="item.icon" />
-        </span>
-        <span
-          v-if="!collapsed"
-          class="ml-3 truncate text-ink group-hover:text-white"
-          :class="{ 'text-white': isActive(item.routeName) }"
-        >
-          {{ item.label }}
-        </span>
-      </router-link>
+          <span
+            class="flex h-10 w-10 items-center justify-center rounded-xl text-base transition-colors duration-200"
+            :class="isActive(item.routeName) ? 'bg-white/20 text-white' : 'bg-white/5 text-ink group-hover:text-white'"
+          >
+            <font-awesome-icon :icon="item.icon" />
+          </span>
+          <span
+            v-if="!collapsed"
+            class="ml-3 truncate text-ink group-hover:text-white"
+            :class="{ 'text-white': isActive(item.routeName) }"
+          >
+            {{ item.label }}
+          </span>
+        </router-link>
+        <div v-else :key="`divider-${item.key}`" class="w-full mt-6 h-0 border-b border-ink/10"></div>
+      </template>
     </nav>
 
     <button
       type="button"
-      class="mt-auto sticky bottom-0 flex items-center justify-center border-t border-ink/10 px-4 py-4 text-ink/70 transition-colors cursor-pointer duration-200 hover:text-white"
+      class="mt-auto sticky bottom-0 flex items-center justify-center border-t border-ink/10 bg-deep px-4 py-4 text-ink/70 transition-colors cursor-pointer duration-200 hover:text-white"
       @click="toggleCollapse"
       aria-label="Prepnut zobrazenie navigacie"
     >
@@ -57,8 +60,11 @@ import {
   faClipboardList,
   faGaugeHigh,
   faGear,
+  faHandsHelping,
+  faIdBadge,
   faQrcode,
   faStar,
+  faTicket,
   faUtensils,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
@@ -70,13 +76,17 @@ export default {
     return {
       collapsed: false,
       navItems: [
-        { label: 'Domov', routeName: 'admin-prehlad', icon: faGaugeHigh },
-        { label: 'Statistiky', routeName: 'admin-statistiky', icon: faChartLine },
+        { label: 'Dashboard', routeName: 'admin-prehlad', icon: faGaugeHigh },
+        { label: 'Štatistiky', routeName: 'admin-statistiky', icon: faChartLine },
         { label: 'Menu', routeName: 'admin-sprava-menu', icon: faUtensils },
-        { label: 'Objednavky', routeName: 'admin-objednavky', icon: faClipboardList },
+        { label: 'Objednávky', routeName: 'admin-objednavky', icon: faClipboardList },
         { label: 'Recenzie', routeName: 'admin-recenzie', icon: faStar },
-        { label: 'Zakaznici', routeName: 'admin-zakaznici', icon: faUsers },
-        { label: 'QR Kody', routeName: 'admin-qr-kody', icon: faQrcode },
+        { label: 'Zákazníci', routeName: 'admin-zakaznici', icon: faUsers },
+        { label: 'Zamestnanci', routeName: 'admin-zamestnanci', icon: faIdBadge },
+        { label: 'QR kódy', routeName: 'admin-qr-kody', icon: faQrcode },
+        { type: 'divider', key: 'nav-divider-main' },
+        { label: 'Predplatné', routeName: 'admin-predplatne', icon: faTicket },
+        { label: 'Pomoc a podpora', routeName: 'admin-pomoc-a-podpora', icon: faHandsHelping },
         { label: 'Nastavenia', routeName: 'admin-nastavenia', icon: faGear },
       ],
       faChevronLeft,
