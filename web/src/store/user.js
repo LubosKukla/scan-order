@@ -52,9 +52,15 @@ const actions = {
   },
 };
 
+const getters = {
+  currentUser: (currentState) => currentState.user,
+  isAuthenticated: (currentState) => !!currentState.user,
+};
+
 export default {
   namespaced: true,
   state,
   mutations,
+  getters,
   actions,
 };
