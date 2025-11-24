@@ -72,7 +72,7 @@ export default {
         const response = await axios.post('/login', this.form);
         console.log('Prihlásenie úspešné:', response.data);
 
-        user.actions.setUser(response.data.user);
+        user.actions.setUser(this.$store, response.data.user);
       } catch (error) {
         console.error('Chyba pri prihlásení:', error);
       }
