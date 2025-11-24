@@ -109,15 +109,9 @@
       </div>
 
       <div class="space-y-3">
-        <p class="text-xs text-deep/70">
-          Testovacie dáta sú zoradené podľa kategórie (Nápoje, Dezerty, Prílohy).
-        </p>
+        <p class="text-xs text-deep/70">Testovacie dáta sú zoradené podľa kategórie (Nápoje, Dezerty, Prílohy).</p>
 
-        <BaseCard
-          v-for="(addon, index) in addons"
-          :key="addon.id"
-          class="space-y-3 border border-deep/10 shadow-2xs"
-        >
+        <BaseCard v-for="(addon, index) in addons" :key="addon.id" class="space-y-3 border border-deep/10 shadow-2xs">
           <div class="flex items-start justify-between gap-2">
             <p class="text-sm font-semibold text-deep">Doplnok #{{ index + 1 }}</p>
             <button type="button" class="close-btn" @click="removeAddon(index)">&times;</button>
@@ -146,13 +140,8 @@
 
           <BaseCard class="space-y-2 border border-deep/10 bg-deep/5">
             <p class="text-sm font-semibold text-deep">Náhľad</p>
-            <div class="aspect-[16/10] overflow-hidden rounded-xl border border-deep/10 bg-white">
-              <img
-                v-if="addon.image"
-                :src="addon.image"
-                :alt="addon.name"
-                class="h-full w-full object-cover"
-              />
+            <div class="aspect-16/10 overflow-hidden rounded-xl border border-deep/10 bg-white">
+              <img v-if="addon.image" :src="addon.image" :alt="addon.name" class="h-full w-full object-cover" />
               <div v-else class="flex h-full items-center justify-center text-sm text-deep/50">Bez obrázka</div>
             </div>
             <div class="space-y-1 text-sm text-deep">
@@ -166,8 +155,77 @@
         </BaseCard>
 
         <div v-if="!addons.length" class="p-3 text-center text-sm text-deep">
-          Kliknite na <strong>Pridať doplnok</strong> a vyberte položku pre tento produkt.
+          Kliknite na
+          <strong>Pridať doplnok</strong>
+          a vyberte položku pre tento produkt.
         </div>
+      </div>
+    </div>
+    <div v-else-if="activeTab === 'options'" class="space-y-4 mb-8">
+      <div class="flex items-center gap-4">
+        <p class="text-sm text-deep">Možnosti, ktoré si zákazník môže pridať alebo odobrať.</p>
+        <BaseButton size="sm" class="ml-auto" icon="add" @click="addOption">Pridať možnosť</BaseButton>
+      </div>
+
+      <BaseCard v-for="(option, index) in options" :key="option.id" class="space-y-3 border border-deep/10 shadow-2xs">
+        <div class="flex items-start justify-between gap-2">
+          <p class="text-sm font-semibold text-deep">Možnosť #{{ index + 1 }}</p>
+          <button type="button" class="close-btn" @click="removeOption(index)">&times;</button>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <div :class="['flex items-center', option.ingredientId ? 'gap-3' : 'gap-0']">
+            <span class="text-2xl text-deep">
+              <font-awesome-icon :icon="option.icon || ['far', 'circle']" />
+            </span>
+            <div class="flex-1">
+              <BaseSelect
+                label="Ingrediencia"
+                v-model="option.ingredientId"
+                :options="ingredientOptions"
+                option-label-key="label"
+                option-value-key="key"
+                placeholder="Vyberte ingredienciu"
+                @update:modelValue="(val) => handleIngredientSelect(option, val)"
+              />
+            </div>
+          </div>
+          <BaseSelect
+            label="Typ možnosti"
+            v-model="option.type"
+            :options="typeOptions"
+            option-label-key="label"
+            option-value-key="key"
+            placeholder="Vyberte typ"
+          />
+          <template v-if="option.ingredientId">
+            <BaseSelect
+              label="Ikona ingrediencie"
+              v-model="option.icon"
+              :options="ingredientIconOptions"
+              option-label-key="label"
+              option-value-key="icon"
+              placeholder="Vyberte ikonu"
+            />
+            <BaseInput label="Názov" v-model="option.name" placeholder="Extra mäso / Bez cibuľky" />
+            <BaseInput label="Hmotnosť" v-model="option.weight" placeholder="100 g" />
+            <BaseInput label="Cena (€)" v-model="option.price" type="number" min="0" step="0.1" />
+          </template>
+        </div>
+
+        <BaseUpload
+          v-if="option.ingredientId"
+          label="Obrázok (voliteľné)"
+          v-model="option.image"
+          placeholder="Vyberte obrázok"
+          accept="image/*"
+        />
+      </BaseCard>
+
+      <div v-if="!options.length" class="p-3 text-center text-sm text-deep">
+        Kliknite na
+        <strong>Pridať možnosť</strong>
+        a doplňte údaje.
       </div>
     </div>
 
@@ -191,10 +249,22 @@ import BaseCard from '@/components/global/containers/BaseCard.vue';
 import BaseButton from '@/components/global/buttons/BaseButton.vue';
 import BaseUpload from '@/components/global/inputs/BaseUpload.vue';
 import { CATEGORY_ICON_OPTIONS } from '@/constants/categoryIcons';
+import { INGREDIENT_ICON_OPTIONS } from '@/constants/ingredientIcons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 export default {
   name: 'MenuItemModal',
-  components: { BaseModal, BaseInput, BaseTextarea, BaseSelect, BaseToggle, BaseCard, BaseButton, BaseUpload },
+  components: {
+    BaseModal,
+    BaseInput,
+    BaseTextarea,
+    BaseSelect,
+    BaseToggle,
+    BaseCard,
+    BaseButton,
+    BaseUpload,
+    FontAwesomeIcon,
+  },
   props: {
     modelValue: {
       type: Boolean,
@@ -223,6 +293,13 @@ export default {
       },
       variants: [],
       addons: [],
+      options: [],
+      ingredientOptions: [
+        { key: 'custom', label: 'Nová ingrediencia' },
+        { key: 'garlic', label: 'Cesnak' },
+        { key: 'onion', label: 'Cibuľa' },
+        { key: 'cheese', label: 'Syr' },
+      ],
       availableAddons: [
         {
           key: 'kofola',
@@ -265,13 +342,14 @@ export default {
           image: 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=800&q=80',
         },
       ],
-      activeTab: 'basic',
+      activeTab: 'both',
       previewUrl: '',
       objectUrl: null,
       tabs: [
         { key: 'basic', label: 'Základné' },
         { key: 'variants', label: 'Varianty' },
         { key: 'addons', label: 'Doplnky' },
+        { key: 'options', label: 'Možnosti' },
       ],
     };
   },
@@ -301,6 +379,21 @@ export default {
           key: addon.key,
           label: `${addon.category} · ${addon.name} (${this.formatPrice(addon.price)})`,
         }));
+    },
+    ingredientIconOptions() {
+      return INGREDIENT_ICON_OPTIONS.map((item) => ({
+        key: item.key,
+        label: item.label,
+        icon: item.icon,
+        value: item.key,
+      }));
+    },
+    typeOptions() {
+      return [
+        { key: 'both', label: 'Pridať / Odobrať' },
+        { key: 'add', label: 'Pridať' },
+        { key: 'remove', label: 'Odobrať' },
+      ];
     },
   },
   watch: {
@@ -343,6 +436,18 @@ export default {
         ? source.variants.map((variant) => this.createVariant(variant))
         : [];
       this.addons = Array.isArray(source.addons) ? source.addons.map((addon) => this.createAddon(addon)) : [];
+      const collectedOptions = [];
+      if (Array.isArray(source.options)) {
+        collectedOptions.push(...source.options.map((opt) => this.createOption(opt)));
+      } else {
+        if (Array.isArray(source.removableOptions)) {
+          collectedOptions.push(...source.removableOptions.map((opt) => this.createOption({ ...opt, type: 'remove' })));
+        }
+        if (Array.isArray(source.addableOptions)) {
+          collectedOptions.push(...source.addableOptions.map((opt) => this.createOption({ ...opt, type: 'add' })));
+        }
+      }
+      this.options = collectedOptions;
       this.setPreviewFromFile(this.form.imageFile);
       this.activeTab = 'basic';
     },
@@ -350,7 +455,15 @@ export default {
       this.proxyVisible = false;
     },
     handleSubmit() {
-      this.$emit('save', { ...this.form, variants: this.variants, addons: this.addons, mode: this.mode });
+      this.$emit('save', {
+        ...this.form,
+        variants: this.variants,
+        addons: this.addons,
+        options: this.options,
+        removableOptions: this.options.filter((opt) => opt.type === 'remove'),
+        addableOptions: this.options.filter((opt) => opt.type === 'add'),
+        mode: this.mode,
+      });
       this.proxyVisible = false;
     },
     setPreviewFromFile(file) {
@@ -385,6 +498,38 @@ export default {
     },
     removeVariant(index) {
       this.variants.splice(index, 1);
+    },
+    createOption(initial = {}) {
+      return {
+        id: initial.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        name: initial.name || '',
+        weight: initial.weight || '',
+        price: initial.price || '',
+        icon: initial.icon || '',
+        ingredientId: initial.ingredientId || '',
+        image: initial.image || '',
+        type: initial.type || 'add',
+      };
+    },
+    addOption() {
+      this.options.push(this.createOption());
+    },
+    removeOption(index) {
+      this.options.splice(index, 1);
+    },
+    handleIngredientSelect(option, key) {
+      option.ingredientId = key;
+      const found = this.ingredientIconOptions.find((item) => item.key === key);
+      if (found?.icon) {
+        option.icon = found.icon;
+      }
+      if (!option.name && key !== 'custom') {
+        option.name = found?.label || option.name;
+      }
+      if (key === 'custom') {
+        option.icon = '';
+        option.name = '';
+      }
     },
     createAddon(initial = {}) {
       return {
