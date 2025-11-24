@@ -1,17 +1,7 @@
 import axios from 'axios';
-import { useSnackbar } from '../composables/useSnackbar';
+import { useSnackbar } from '@/composables/useSnackbar';
 
 const snackbar = useSnackbar();
-
-const state = () => ({
-  user: null,
-});
-
-const mutations = {
-  SET_USER(currentState, user) {
-    currentState.user = user;
-  },
-};
 
 const actions = {
   async prihlasenie({ commit }, credentials) {
@@ -30,12 +20,7 @@ const actions = {
       return response.data;
     } catch (error) {
       const data = error?.response?.data;
-      const serverErrors = data?.errors
-        ? Object.values(data.errors)
-            .flat()
-            .filter(Boolean)
-            .join(' ')
-        : '';
+      const serverErrors = data?.errors ? Object.values(data.errors).flat().filter(Boolean).join(' ') : '';
       const message =
         serverErrors || data?.message || data?.error || 'Prihlásenie zlyhalo. Skontrolujte údaje a skúste znova.';
 
@@ -47,20 +32,6 @@ const actions = {
       throw error;
     }
   },
-  setUser({ commit }, user) {
-    commit('SET_USER', user);
-  },
 };
 
-const getters = {
-  currentUser: (currentState) => currentState.user,
-  isAuthenticated: (currentState) => !!currentState.user,
-};
-
-export default {
-  namespaced: true,
-  state,
-  mutations,
-  getters,
-  actions,
-};
+export default actions;
