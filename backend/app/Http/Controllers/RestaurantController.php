@@ -18,16 +18,22 @@ class RestaurantController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $restaurant->loadMissing([
-            'user',
             'address',
             'typeRestaurant',
             'kitchens',
             'restaurantBilling.plan',
             'reviews',
+            'user' => fn($query) => $query->select('id', 'email', 'phone'),
         ]);
 
         return response()->json([
-            'restaurant' => $restaurant,
+            'restaurant' => array_merge(
+                $restaurant->toArray(),
+                [
+                    'email' => optional($restaurant->user)->email,
+                    'phone' => optional($restaurant->user)->phone,
+                ],
+            ),
         ]);
     }
 }

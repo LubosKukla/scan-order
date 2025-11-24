@@ -16,13 +16,19 @@ class CustomerController extends Controller
         }
 
         $customer->loadMissing([
-            'user',
             'address',
             'baskets',
             'reviews',
+            'user' => fn($query) => $query->select('id', 'email', 'phone'),
         ]);
         return response()->json([
-            'customer' => $customer,
+            'customer' => array_merge(
+                $customer->toArray(),
+                [
+                    'email' => optional($customer->user)->email,
+                    'phone' => optional($customer->user)->phone,
+                ],
+            ),
         ]);
     }
 }
