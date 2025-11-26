@@ -73,7 +73,7 @@ export default {
   computed: {
     rootClasses() {
       const base =
-        'inline-flex items-center rounded-xl text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer';
+        'inline-flex items-center justify-center rounded-xl text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer';
       const gap = this.iconComponent && this.hasSlotContent ? 'gap-2' : '';
       const padding = this.isCompact ? 'p-2' : 'px-6 py-2';
 

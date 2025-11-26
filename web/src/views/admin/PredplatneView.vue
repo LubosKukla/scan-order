@@ -2,7 +2,7 @@
   <section class="page space-y-6">
     <AdminPageHeader title="Predplatné & Fakturácia" subtitle="Spravujte balíky, platby a fakturačné údaje." />
 
-    <BaseCard class="space-y-4 border-primary/30 bg-primary/5">
+    <BaseCard class="space-y-4 border-primary/30 bg-primary/5!">
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div class="flex items-start gap-3">
           <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -53,7 +53,9 @@
         <div class="flex flex-col gap-2 md:flex-row md:items-center">
           <BaseButton variant="secondary" @click="scrollToSection('pricingRef')">Zmeniť balík</BaseButton>
           <BaseButton variant="secondary" @click="scrollToSection('historyRef')">História faktúr</BaseButton>
-          <BaseButton variant="secondary" class="text-danger!" @click="cancelPlan()">Zrušiť predplatné</BaseButton>
+          <BaseButton variant="secondary" class="text-danger! align-middle" @click="cancelPlan()">
+            Zrušiť predplatné
+          </BaseButton>
         </div>
       </div>
 
@@ -104,7 +106,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-deep/70">Fakturačný cyklus</span>
-          <BaseToggle v-model="isYearly" :label="isYearly ? 'Ročne (‑20%)' : 'Mesačne'" />
+          <BaseToggle v-model="isYearly" :label="isYearly ? 'Ročne (-20%)' : 'Mesačne'" />
         </div>
       </div>
 
@@ -235,7 +237,7 @@
         <p class="text-base font-semibold text-deep">História faktúr</p>
         <p class="text-sm text-deep/70">Prehľad vašich faktúr a platieb</p>
       </div>
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto hidden md:block">
         <table class="min-w-full text-sm text-deep">
           <thead>
             <tr class="text-left text-deep/60">
@@ -255,18 +257,53 @@
               </td>
               <td class="py-3">{{ formatPrice(invoice.amount) }}</td>
               <td class="py-3">
-                <div class="rounded-lg bg-primary/15 px-2 w-fit">
-                  <span class="text-xs font-semibold text-primary">
-                    {{ invoice.status }}
-                  </span>
-                </div>
+                <PaymentStatusBadge :status="invoice.status" />
               </td>
               <td class="py-3 text-right">
-                <button class="text-primary hover:text-primary/80" type="button">Stiahnuť</button>
+                <BaseButton
+                  variant="noBackground"
+                  icon="download"
+                  class="!px-0 !py-1 text-primary hover:text-primary/80"
+                  type="button"
+                >
+                  Stiahnuť
+                </BaseButton>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="md:hidden space-y-3">
+        <div
+          v-for="invoice in invoices"
+          :key="invoice.id"
+          class="rounded-2xl border border-ink/15 bg-white px-3 py-3 shadow-2xs"
+        >
+          <div class="flex items-center justify-between">
+            <div class="font-semibold text-deep">{{ invoice.id }}</div>
+            <PaymentStatusBadge :status="invoice.status" />
+          </div>
+          <div class="mt-2 grid grid-cols-2 gap-2 text-sm text-deep/80">
+            <div class="flex items-center gap-2">
+              <font-awesome-icon :icon="faCalendar" class="text-deep/50" />
+              <span>{{ invoice.date }}</span>
+            </div>
+            <div class="text-right font-semibold text-deep">
+              {{ formatPrice(invoice.amount) }}
+            </div>
+          </div>
+          <div class="mt-3 flex justify-end">
+            <BaseButton
+              variant="noBackground"
+              icon="download"
+              class="px-0! py-1! text-primary hover:text-primary/80 text-sm font-medium"
+              type="button"
+            >
+              Stiahnuť
+            </BaseButton>
+          </div>
+        </div>
       </div>
     </BaseCard>
   </section>
@@ -288,10 +325,10 @@
 
   <BaseModal v-model="showBillingModal" title="Upraviť fakturačné údaje">
     <div class="space-y-4">
-      <label class="inline-flex items-center gap-2 text-sm text-deep/80">
-        <input type="checkbox" v-model="billingForm.isCompany" class="h-4 w-4 rounded border-ink/40" />
-        <span>Fakturujem na firmu</span>
-      </label>
+      <BaseCheckbox v-model="billingForm.isCompany">
+        <span class="text-primary/80 font-bold">Fakturovať</span>
+        na firmu
+      </BaseCheckbox>
 
       <BaseInput v-if="billingForm.isCompany" v-model="billingForm.companyName" label="Názov firmy" />
       <BaseInput v-else v-model="billingForm.fullName" label="Meno a priezvisko" />
@@ -328,8 +365,10 @@ import AdminPageHeader from '@/components/layout/funkcionality/AdminPageHeader.v
 import BaseButton from '@/components/global/buttons/BaseButton.vue';
 import BaseCard from '@/components/global/containers/BaseCard.vue';
 import BaseInput from '@/components/global/inputs/BaseInput.vue';
+import BaseCheckbox from '@/components/global/inputs/BaseCheckbox.vue';
 import BaseToggle from '@/components/global/inputs/BaseToggle.vue';
 import BaseModal from '@/components/global/containers/BaseModal.vue';
+import PaymentStatusBadge from '@/components/global/payments/PaymentStatusBadge.vue';
 import { useSnackbar } from '@/composables/useSnackbar';
 
 export default {
@@ -338,9 +377,11 @@ export default {
     AdminPageHeader,
     BaseButton,
     BaseCard,
+    BaseCheckbox,
     BaseInput,
     BaseToggle,
     BaseModal,
+    PaymentStatusBadge,
     FontAwesomeIcon,
   },
   data() {
