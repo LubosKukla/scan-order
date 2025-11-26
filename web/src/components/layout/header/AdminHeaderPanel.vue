@@ -105,7 +105,7 @@ export default {
     },
     logout() {
       this.$store.dispatch('user/odhlasenie').then(() => {
-        this.$router.push({ name: 'web-home' });
+        this.$router.push({ name: 'web-domov' });
       });
     },
   },

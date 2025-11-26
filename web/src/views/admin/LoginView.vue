@@ -65,8 +65,9 @@ export default {
   methods: {
     async submit() {
       try {
-        const response = await this.$store.dispatch('user/prihlasenie', this.form);
-        console.log('Prihlásenie úspešné:', response);
+        await this.$store.dispatch('user/prihlasenie', this.form).then(() => {
+          this.$router.push({ name: 'admin-prehlad' });
+        });
       } catch (error) {
         console.error('Chyba pri prihlásení:', error);
       }

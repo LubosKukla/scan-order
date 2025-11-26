@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '@/store';
 
 // Helper auth/role checks
 // function isAdmin() {
@@ -214,7 +215,7 @@ const routes = [
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    meta: { section: 'web', title: 'Stránka nenájdená', useWebShell: true },
+    meta: { section: 'web', title: 'Stránka nenájdená', showInMore: true },
     component: () => import('../views/web/NotFoundView.vue'),
   },
 ];
@@ -230,15 +231,27 @@ const router = createRouter({
   },
 });
 
-// Guard: admin sekcia len pre admina, ostatné pre všetkých
-router.beforeEach((to, from, next) => {
-  // const roleRequired = to.matched.find((r) => r.meta && r.meta.requiresRole)?.meta.requiresRole;
-  // if (roleRequired === 'admin') {
-  //   //odkomentujem ked bude ready logins
-  //   // if (!isAdmin()) {
-  //   //   return next({ name: 'admin-login', query: { redirect: to.fullPath } });
-  //   // }
-  // }
+router.beforeEach(async (to, from, next) => {
+  const requiresAdmin = to.matched.some((r) => r.meta && r.meta.requiresRole === 'admin');
+  const isLoggedIn = store.getters['user/isLoggedIn'];
+
+  // Ak idem na admin a ešte nemám usera, skúsim ho načítať
+  if (requiresAdmin && !isLoggedIn) {
+    try {
+      await store.dispatch('user/fetchCurrentUser');
+    } catch (e) {
+      // ignore
+    }
+    if (!store.getters['user/isLoggedIn']) {
+      return next({ name: 'admin-login' });
+    }
+  }
+
+  // Už prihlásený admin nech nejde zbytočne na login
+  if (to.name === 'admin-login' && store.getters['user/isLoggedIn']) {
+    return next({ name: 'admin-prehlad' });
+  }
+
   return next();
 });
 
