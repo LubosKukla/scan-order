@@ -60,7 +60,7 @@ export default {
     const variantIconClasses = {
       danger: 'bg-danger text-white',
       success: 'bg-primary text-white',
-      info: 'bg-info text-white',
+      info: 'bg-primary text-white',
       warning: 'bg-warning text-white',
       default: 'bg-deep text-white',
     };

@@ -2,6 +2,7 @@
   <div id="app" class="min-h-screen" :class="{ 'bg-deep text-ink flex flex-col md:flex-row': showAdmin }">
     <NavBarAdmin v-if="showAdmin" />
     <div class="flex-1 min-h-screen" :class="{ 'bg-surface text-ink flex flex-col': showAdmin }">
+      <AdminWebBanner v-if="!showAdmin && isAuthenticated" />
       <template v-if="showAdmin">
         <AdminHeaderPanel />
       </template>
@@ -29,6 +30,7 @@ import AdminHeaderPanel from './components/layout/header/AdminHeaderPanel.vue';
 import AdminFooter from './components/layout/footer/AdminFooter.vue';
 import WebFooter from './components/layout/footer/WebFooter.vue';
 import SnackbarStack from './components/global/feedback/SnackbarStack.vue';
+import AdminWebBanner from './components/layout/header/AdminWebBanner.vue';
 
 export default {
   name: 'AppRoot',
@@ -39,6 +41,7 @@ export default {
     AdminFooter,
     WebFooter,
     SnackbarStack,
+    AdminWebBanner,
   },
   computed: {
     matchedRoutes() {
@@ -54,6 +57,9 @@ export default {
       if (this.showAdmin) return false;
       const hasMore = this.matchedRoutes.some((r) => r.meta && r.meta.showInMore);
       return this.isWebSection || hasMore;
+    },
+    isAuthenticated() {
+      return this.$store.getters['user/isLoggedIn'];
     },
   },
 };

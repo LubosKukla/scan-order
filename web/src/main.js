@@ -32,4 +32,9 @@ if (typeof window !== 'undefined') {
   );
 }
 
-createApp(App).use(store).use(router).mount('#app');
+store
+  .dispatch('user/fetchCurrentUser')
+  .catch(() => null)
+  .finally(() => {
+    createApp(App).use(store).use(router).mount('#app');
+  });
