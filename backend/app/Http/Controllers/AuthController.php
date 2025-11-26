@@ -40,6 +40,7 @@ class AuthController extends Controller
                     'email' => $credentials['email'],
                     'password' => Hash::make($credentials['password']),
                     'accept_gdpr' => $request->boolean('accept_gdpr'),
+                    'role' => 'customer',
                 ]);
 
                 Customer::create([
@@ -111,6 +112,7 @@ class AuthController extends Controller
                     'password' => Hash::make($data['password']),
                     'accept_gdpr' => $request->boolean('accept_gdpr'),
                     'phone' => $data['phone'],
+                    'role' => 'restaurant',
                 ]);
 
                 $address = Address::create([
@@ -216,10 +218,7 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return response()->json([
-            'user' => $request->user()->loadMissing([
-                'customer',
-                'restaurants',
-            ]),
+            'user' => $request->user()
         ]);
     }
 

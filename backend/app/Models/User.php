@@ -22,6 +22,7 @@ class User extends Authenticatable
         'password',
         'accept_gdpr',
         'phone',
+        'role',
     ];
 
     /**

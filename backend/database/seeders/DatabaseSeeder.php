@@ -15,7 +15,9 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
         $this->call([
             PlanSeeder::class,
-            // ... ďalšie seedre
+            CustomerSeeder::class,
+            RestaurantSeeder::class,
+            // ... dalsie seedre
         ]);
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

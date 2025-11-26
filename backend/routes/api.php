@@ -28,7 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::group([], function () {
     Route::get('/types/restaurant', [RestaurantController::class, 'getTypes']);
-    Route::get('/');
+    Route::get('/types/kitchen', [RestaurantController::class, 'getKitchens']);
 });
 
 Route::middleware(['auth:sanctum', 'customer'])
@@ -47,4 +47,6 @@ Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
 
 Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
     ->prefix('restaurants/{restaurant}')
-    ->group(function () {});
+    ->group(function () {
+        Route::get('/openhours', [RestaurantController::class, 'getOpenHours']);
+    });

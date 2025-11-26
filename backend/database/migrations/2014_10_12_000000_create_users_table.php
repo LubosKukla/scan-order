@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('password');
             $table->boolean("accept_gdpr");
             $table->string('phone')->nullable();
+            $table->string('role');
             $table->rememberToken();
             $table->timestamps();
         });
