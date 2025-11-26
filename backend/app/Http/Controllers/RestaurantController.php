@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
+use App\Models\Type_restaurant;
 use Illuminate\Http\Request;
+use Nette\Utils\Type;
 
 class RestaurantController extends Controller
 {
@@ -35,5 +37,11 @@ class RestaurantController extends Controller
                 ],
             ),
         ]);
+    }
+
+    public function getTypes()
+    {
+        $types = Type_restaurant::all();
+        return response()->json(['types' => $types]);
     }
 }

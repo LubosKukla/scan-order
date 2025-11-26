@@ -22,12 +22,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'me']);
-
-
     // Authenticated routes can be added here...
 });
 
 
+Route::group([], function () {
+    Route::get('/types/restaurant', [RestaurantController::class, 'getTypes']);
+    Route::get('/');
+});
 
 Route::middleware(['auth:sanctum', 'customer'])
     ->group(function () {
