@@ -50,10 +50,26 @@
             <span class="text-deep/60">Obnovuje sa automaticky</span>
           </div>
         </div>
-        <div class="flex flex-col gap-2 md:flex-row md:items-center">
-          <BaseButton variant="secondary" @click="scrollToSection('pricingRef')">Zmeniť balík</BaseButton>
-          <BaseButton variant="secondary" @click="scrollToSection('historyRef')">História faktúr</BaseButton>
-          <BaseButton variant="secondary" class="text-danger! align-middle" @click="cancelPlan()">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-end">
+          <BaseButton
+            variant="secondary"
+            class="w-full md:w-auto justify-center"
+            @click="scrollToSection('pricingRef')"
+          >
+            Zmeniť balík
+          </BaseButton>
+          <BaseButton
+            variant="secondary"
+            class="w-full md:w-auto justify-center"
+            @click="scrollToSection('historyRef')"
+          >
+            História faktúr
+          </BaseButton>
+          <BaseButton
+            variant="secondary"
+            class="w-full md:w-auto justify-center text-danger! hover:border-danger!"
+            @click="showCancelModal = true"
+          >
             Zrušiť predplatné
           </BaseButton>
         </div>
@@ -355,6 +371,26 @@
       <BaseButton @click="saveBilling">Uložiť údaje</BaseButton>
     </template>
   </BaseModal>
+
+  <BaseModal v-model="showCancelModal" title="Naozaj chcete zrušiť predplatné?">
+    <div class="space-y-3 text-deep">
+      <p class="text-sm text-deep/80">
+        Predplatné zostane aktívne do
+        <strong>{{ currentPlan.endDate }}</strong>
+        . Po tomto dátume sa už neobnoví, ale váš účet a dáta zostanú pripravené, ak sa rozhodnete vrátiť.
+      </p>
+      <p class="text-sm text-deep/70">
+        Môžete sa kedykoľvek znovu prihlásiť a zvoliť si nový balík. Počas zostávajúceho obdobia vám všetko funguje ako
+        doteraz.
+      </p>
+    </div>
+    <template #footer>
+      <BaseButton @click="showCancelModal = false">Nezrušiť</BaseButton>
+      <BaseButton class="border-danger! text-danger!" variant="secondary" @click="confirmCancel">
+        Zrušiť predplatné
+      </BaseButton>
+    </template>
+  </BaseModal>
 </template>
 
 <script>
@@ -393,6 +429,7 @@ export default {
       isYearly: false,
       showCardModal: false,
       showBillingModal: false,
+      showCancelModal: false,
       trial: {
         daysLeft: 52,
         totalDays: 90,
@@ -547,7 +584,8 @@ export default {
       this.snackbar.notify({ message: 'Fakturačné údaje boli uložené.', variant: 'success' });
     },
 
-    cancelPlan() {
+    confirmCancel() {
+      this.showCancelModal = false;
       this.snackbar.notify({ message: 'Predplatné bolo zrušené', variant: 'deep' });
     },
   },
