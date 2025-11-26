@@ -1,5 +1,5 @@
 ﻿<template>
-  <div id="app" class="min-h-screen" :class="{ 'flex bg-deep text-ink': showAdmin }">
+  <div id="app" class="min-h-screen" :class="{ 'bg-deep text-ink flex flex-col md:flex-row': showAdmin }">
     <NavBarAdmin v-if="showAdmin" />
     <div class="flex-1 min-h-screen" :class="{ 'bg-surface text-ink flex flex-col': showAdmin }">
       <template v-if="showAdmin">
@@ -69,5 +69,10 @@ export default {
 
 #app {
   box-sizing: border-box;
+}
+
+button,
+a {
+  cursor: pointer;
 }
 </style>
