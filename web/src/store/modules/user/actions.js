@@ -4,7 +4,7 @@ import { useSnackbar } from '@/composables/useSnackbar';
 const snackbar = useSnackbar();
 
 const actions = {
-  async prihlasenie({ commit, dispatch, getters, state }, credentials) {
+  async prihlasenie({ dispatch, getters, state }, credentials) {
     try {
       if (getters.isLoggedIn) {
         snackbar.notify({
@@ -18,13 +18,10 @@ const actions = {
       const response = await axios.post('/login', credentials);
 
       // Načítanie aktuálneho používateľa po prihlásení
-      const freshUser = await dispatch('fetchCurrentUser');
-      const loggedUser = freshUser || response.data || { email: credentials.email };
-
-      commit('SET_USER', loggedUser);
+      await dispatch('fetchCurrentUser');
 
       snackbar.notify({
-        message: 'Boli ste úspešne prihlásený.' + loggedUser.email,
+        message: 'Boli ste úspešne prihlásený. ' + state.user.user.email,
         variant: 'success',
       });
 
@@ -54,6 +51,24 @@ const actions = {
         return null;
       }
       throw error;
+    }
+  },
+  async odhlasenie({ commit }) {
+    try {
+      await axios.get('/sanctum/csrf-cookie');
+      await axios.post('/logout');
+    } catch (error) {
+      // Aj keď API zlyhá odpojíme usera lokálne
+      if (!error?.response || error?.response?.status !== 401) {
+        throw error;
+      }
+    } finally {
+      commit('SET_USER', null);
+
+      snackbar.notify({
+        message: 'Boli ste odhlásený.',
+        variant: 'success',
+      });
     }
   },
 };

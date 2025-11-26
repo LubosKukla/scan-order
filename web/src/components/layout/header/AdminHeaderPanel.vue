@@ -104,7 +104,9 @@ export default {
       this.showRestaurantDropdown = !this.showRestaurantDropdown;
     },
     logout() {
-      this.$emit('logout');
+      this.$store.dispatch('user/odhlasenie').then(() => {
+        this.$router.push({ name: 'web-home' });
+      });
     },
   },
 };
