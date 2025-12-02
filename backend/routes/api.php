@@ -49,4 +49,7 @@ Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
     ->prefix('restaurants/{restaurant}')
     ->group(function () {
         Route::get('/openhours', [RestaurantController::class, 'getOpenHours']);
+
+
+        Route::get('/billing', [RestaurantController::class, 'getBillingInfo']);
     });

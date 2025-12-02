@@ -27,7 +27,7 @@ class RestaurantSeeder extends Seeder
                     'name'            => 'Central Cafe',
                     'name_boss'       => 'Eva Malakova',
                     'description'     => 'Male prijemne bistro v centre mesta.',
-                    'number_of_tables'=> 18,
+                    'number_of_tables' => 18,
                     'is_active'       => true,
                 ],
                 'address' => [
@@ -48,7 +48,7 @@ class RestaurantSeeder extends Seeder
                     'name'            => 'Modry Hlav',
                     'name_boss'       => 'Peter Kollar',
                     'description'     => 'Jednoduche obedove menu s domacou kuchynou.',
-                    'number_of_tables'=> 24,
+                    'number_of_tables' => 24,
                     'is_active'       => true,
                 ],
                 'address' => [
@@ -69,7 +69,7 @@ class RestaurantSeeder extends Seeder
                     'name'            => 'River Garden',
                     'name_boss'       => 'Marek Kamen',
                     'description'     => 'Moderny podnik s vecernym menu a drinkami.',
-                    'number_of_tables'=> 30,
+                    'number_of_tables' => 30,
                     'is_active'       => false,
                 ],
                 'address' => [
