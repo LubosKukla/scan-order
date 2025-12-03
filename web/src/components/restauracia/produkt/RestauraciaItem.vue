@@ -1,5 +1,5 @@
 <template>
-  <div class="box overflow-hidden rounded-xl bg-white text-deep shadow-lg ring-1 ring-ink/10 max-w-xs">
+  <BaseCard class="box overflow-hidden text-deep" no-padding>
     <div class="relative aspect-4/3 overflow-hidden">
       <img :src="image" :alt="title" class="h-full w-full object-cover" />
       <button
@@ -46,18 +46,19 @@
         </button>
       </div>
     </div>
-  </div>
+  </BaseCard>
 </template>
 
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faHeart as faHeartSolid, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import BaseCard from '@/components/global/containers/BaseCard.vue';
 import { formatCurrency } from '@/utils/formatters';
 
 export default {
   name: 'RestauraciaItem',
-  components: { FontAwesomeIcon },
+  components: { FontAwesomeIcon, BaseCard },
   emits: ['toggle-favorite', 'add-to-cart'],
   props: {
     title: { type: String, required: true },
@@ -67,29 +68,13 @@ export default {
       type: String,
       default: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=800&q=80',
     },
-    tags: {
-      type: Array,
-      default: () => [],
-    },
-    likes: {
-      type: [Number, String, null],
-      default: null,
-    },
-    favorite: {
-      type: Boolean,
-      default: false,
-    },
-    currency: {
-      type: String,
-      default: 'EUR',
-    },
+    tags: { type: Array, default: () => [] },
+    likes: { type: [Number, String, null], default: null },
+    favorite: { type: Boolean, default: false },
+    currency: { type: String, default: 'EUR' },
   },
   data() {
-    return {
-      faHeartSolid,
-      faHeartRegular,
-      faPlus,
-    };
+    return { faHeartSolid, faHeartRegular, faPlus };
   },
   computed: {
     priceLabel() {

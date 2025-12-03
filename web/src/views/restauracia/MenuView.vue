@@ -11,18 +11,25 @@
         @add-to-cart="add(group.id, $event)"
       />
     </div>
+    <CartBar :count="cart.count" :total="cart.total" :table-label="cart.tableLabel" />
   </div>
 </template>
 
 <script>
 import MenuHero from '@/components/restauracia/MenuHero.vue';
 import ProduktHolder from '@/components/restauracia/produkt/ProduktHolder.vue';
+import CartBar from '@/components/restauracia/CartBar.vue';
 
 export default {
   name: 'RestauraciaMenuView',
-  components: { MenuHero, ProduktHolder },
+  components: { MenuHero, ProduktHolder, CartBar },
   data() {
     return {
+      cart: {
+        count: 2,
+        total: 11.98,
+        tableLabel: 'Stôl 12',
+      },
       groups: [
         {
           id: 'pizza',
