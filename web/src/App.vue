@@ -6,6 +6,9 @@
       <template v-if="showAdmin">
         <AdminHeaderPanel />
       </template>
+      <template v-else-if="showRestauracia">
+        <RestaurantHeader />
+      </template>
       <template v-else-if="showInMore">
         <WebHeader />
       </template>
@@ -31,6 +34,7 @@ import AdminFooter from './components/layout/footer/AdminFooter.vue';
 import WebFooter from './components/layout/footer/WebFooter.vue';
 import SnackbarStack from './components/global/feedback/SnackbarStack.vue';
 import AdminWebBanner from './components/layout/header/AdminWebBanner.vue';
+import RestaurantHeader from './components/layout/header/RestaurantHeader.vue';
 
 export default {
   name: 'AppRoot',
@@ -42,6 +46,7 @@ export default {
     WebFooter,
     SnackbarStack,
     AdminWebBanner,
+    RestaurantHeader,
   },
   computed: {
     matchedRoutes() {
@@ -52,6 +57,9 @@ export default {
     },
     showAdmin() {
       return this.matchedRoutes.some((r) => r.meta && r.meta.requiresRole === 'admin');
+    },
+    showRestauracia() {
+      return this.matchedRoutes.some((r) => r.meta && r.meta.section === 'restauracia');
     },
     showInMore() {
       if (this.showAdmin) return false;

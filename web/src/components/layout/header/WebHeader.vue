@@ -111,6 +111,5 @@ export default {
 .mobile-nav a.router-link-active,
 .mobile-nav a.router-link-exact-active {
   font-weight: 900;
-  /* extra bold when active */
 }
 </style>
