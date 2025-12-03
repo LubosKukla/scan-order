@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import RestaurantBadge from '../funkcionality/RestaurantBadge.vue';
+import RestaurantBadge from '../../restauracia/RestaurantBadge.vue';
 
 export default {
   name: 'RestaurantHeader',
