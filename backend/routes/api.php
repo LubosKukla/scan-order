@@ -49,8 +49,11 @@ Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
 Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
     ->prefix('restaurants/{restaurant}')
     ->group(function () {
+        //otvaracie hodiny
         Route::get('/openhours', [RestaurantController::class, 'getOpenHours']);
-
+        Route::post('/openhours', [RestaurantController::class, 'setOpenHours']);
+        Route::put('/openhours', [RestaurantController::class, 'updateOpenHours']);
+        Route::delete('/openhours', [RestaurantController::class, 'deleteOpenHours']);
 
         Route::get('/billing', [RestaurantBilling::class, 'getBillingInfo']);
         Route::post('/billing', [RestaurantBilling::class, 'addBillingInfo']);
