@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('restaurant_id')->constrained()->onDelete('cascade');
             $table->foreignId('plan_id')->nullable()->constrained('plans')->nullOnDelete();
+            $table->string('company_name')->nullable();
             $table->string('ico')->nullable();
             $table->string('dic')->nullable();
             $table->string('ic_dph')->nullable();

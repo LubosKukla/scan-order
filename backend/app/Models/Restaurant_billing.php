@@ -17,7 +17,8 @@ class Restaurant_billing extends Model
         'ic_dph',
         'iban',
         'trial_ends_at',
-        'subscription_status'
+        'subscription_status',
+        'company_name'
     ];
 
     protected $casts = [

@@ -52,19 +52,5 @@ class RestaurantController extends Controller
         return response()->json(['kitchens' => $kitchens]);
     }
 
-    public function getOpenHours(Restaurant $restaurant)
-    {
-        $user = auth()->user();
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        if ($user->id !== $restaurant->user_id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        $openHours = $restaurant->openHours;
-
-        return response()->json(['open_hours' => $openHours]);
-    }
+    public function getOpenHours(Restaurant $restaurant) {}
 }

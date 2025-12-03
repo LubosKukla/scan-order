@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\RestaurantBilling;
 use App\Http\Controllers\RestaurantController;
 use App\Models\Customer;
 use App\Models\Restaurant;
@@ -51,5 +52,6 @@ Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
         Route::get('/openhours', [RestaurantController::class, 'getOpenHours']);
 
 
-        Route::get('/billing', [RestaurantController::class, 'getBillingInfo']);
+        Route::get('/billing', [RestaurantBilling::class, 'getBillingInfo']);
+        Route::post('/billing', [RestaurantBilling::class, 'addBillingInfo']);
     });
