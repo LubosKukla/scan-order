@@ -1,5 +1,4 @@
 import { createStore } from 'vuex';
-import auth from './modules/auth';
 import user from './modules/user';
 import restaurant from './modules/restaurant';
 import menu from './modules/menu';
@@ -13,7 +12,6 @@ import settings from './modules/settings';
 
 export default createStore({
   modules: {
-    auth,
     user,
     restaurant,
     menu,

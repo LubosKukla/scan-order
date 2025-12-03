@@ -6,8 +6,9 @@
           <img src="@/assets/img/logo-scan-order.svg" alt="ScanOrder logo" class="w-40 select-none h-auto" />
         </router-link>
 
-        <div class="flex flex-1 items-center justify-end">
-          <RestaurantBadge label="Stôl 12" />
+        <div class="flex flex-1 items-center justify-end gap-2">
+          <RestaurantBadge label="Stol 12" />
+          <RestaurantLogin />
         </div>
       </div>
     </div>
@@ -16,10 +17,11 @@
 
 <script>
 import RestaurantBadge from '../../restauracia/RestaurantBadge.vue';
+import RestaurantLogin from '../../restauracia/RestaurantLogin.vue';
 
 export default {
   name: 'RestaurantHeader',
-  components: { RestaurantBadge },
+  components: { RestaurantBadge, RestaurantLogin },
 };
 </script>
 

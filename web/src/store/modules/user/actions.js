@@ -3,6 +3,15 @@ import { useSnackbar } from '@/composables/useSnackbar';
 
 const snackbar = useSnackbar();
 
+function isValidEmail(email) {
+  //vzorec na overenie email mi dala AI
+  return typeof email === 'string' && /\S+@\S+\.\S+/.test(email);
+}
+
+function isValidPassword(password) {
+  return typeof password === 'string' && password.length >= 8;
+}
+
 const actions = {
   async prihlasenie({ dispatch, getters, state }, credentials) {
     try {
@@ -12,6 +21,16 @@ const actions = {
           variant: 'info',
         });
         return state.user;
+      }
+
+      if (!isValidEmail(credentials?.email)) {
+        snackbar.notify({ message: 'Zadajte platný email.', variant: 'danger' });
+        return false;
+      }
+
+      if (!isValidPassword(credentials?.password)) {
+        snackbar.notify({ message: 'Heslo musí mať aspoň 8 znakov.', variant: 'danger' });
+        return false;
       }
 
       await axios.get('/sanctum/csrf-cookie');
@@ -25,7 +44,7 @@ const actions = {
         variant: 'success',
       });
 
-      return response.data;
+      return response.data || true;
     } catch (error) {
       const data = error?.response?.data;
       const message = data?.message || 'Prihlásenie zlyhalo. Skontrolujte údaje a skúste znova.';
