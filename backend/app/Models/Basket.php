@@ -15,6 +15,7 @@ class Basket extends Model
         'status',
         'subtotal',
         'total',
+        'cart_token',
     ];
 
     public function restaurant()

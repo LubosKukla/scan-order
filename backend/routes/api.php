@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BasketController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\RestaurantBilling;
 use App\Http\Controllers\RestaurantController;
@@ -23,7 +24,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'me']);
-    // Authenticated routes can be added here...
 });
 
 
@@ -32,14 +32,28 @@ Route::group([], function () {
     Route::get('/types/kitchen', [RestaurantController::class, 'getKitchens']);
 });
 
+
+
 Route::middleware(['auth:sanctum', 'customer'])
     ->group(function () {
         Route::get('/customers/{customer}', [CustomerController::class, 'show']);
     });
 
+
 Route::middleware(['auth:sanctum', 'customer'])
     ->prefix('customers/{customer}')
-    ->group(function () {});
+    ->group(function () {
+
+        //kosik pre prihlaseneho uzivatela
+        Route::get('/baskets', [BasketController::class, 'getBaskets']);
+        Route::post('/restaurants/{restaurant}/basket/items', [BasketController::class, 'addItemToBasket']);
+        Route::put('/baskets/{basket}/items/{item}', [BasketController::class, 'updateItemInBasket']);
+        Route::delete('/baskets/{basket}/items/{item}', [BasketController::class, 'removeItemFromBasket']);
+    });
+
+
+
+
 
 Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
     ->group(function () {
