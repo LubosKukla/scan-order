@@ -217,20 +217,20 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->load(['user', 'restaurant', 'customer']);
+        $user = $request->user()->load(['restaurants', 'customer']);
 
-        if ($user->restaurant) {
+        if ($user->restaurants->isNotEmpty()) {
             return response()->json([
                 'type' => 'restaurant',
-                'user' => $user->user,
-                'restaurant' => $user->restaurant,
+                'user' => $request->user(),
+                'restaurants' => $user->restaurants,
             ]);
         }
 
         if ($user->customer) {
             return response()->json([
                 'type' => 'customer',
-                'user' => $user->user,
+                'user' => $request->user(),
                 'customer' => $user->customer,
             ]);
         }
