@@ -10,6 +10,7 @@ use Nette\Utils\Type;
 
 class RestaurantController extends Controller
 {
+
     public function show(Restaurant $restaurant)
     {
         $user = auth()->user();

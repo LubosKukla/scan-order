@@ -217,9 +217,23 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return response()->json([
-            'user' => $request->user()
-        ]);
+        $user = $request->user()->load(['restaurant', 'customer']);
+
+        if ($user->restaurant) {
+            return response()->json([
+                'type' => 'restaurant',
+                'data' => $user->restaurant,
+            ]);
+        }
+
+        if ($user->customer) {
+            return response()->json([
+                'type' => 'customer',
+                'data' => $user->customer,
+            ]);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
 
     /**
