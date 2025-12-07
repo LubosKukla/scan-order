@@ -166,9 +166,14 @@
             <p class="text-base font-semibold text-deep">Otváracie hodiny</p>
             <p class="text-sm text-deep/70">Nastavte prevádzkové hodiny reštaurácie</p>
           </div>
-          <BaseButton variant="secondary" class="w-full md:w-auto" @click="copyFirstDayToAll">
-            Kopírovať na všetky dni
-          </BaseButton>
+          <div class="flex w-full flex-col gap-2 md:w-auto md:flex-row">
+            <BaseButton variant="secondary" class="w-full md:w-auto" @click="copyFirstDayToAll">
+              Kopírovať na všetky dni
+            </BaseButton>
+            <BaseButton variant="danger" class="w-full md:w-auto" icon="trash" @click="deleteHours">
+              Vymazať hodiny
+            </BaseButton>
+          </div>
         </div>
 
         <div class="space-y-2">
@@ -459,6 +464,9 @@ export default {
       },
     };
   },
+  mounted() {
+    this.loadOpenHours();
+  },
   watch: {
     'profileForm.logo'(newVal) {
       if (this.logoPreviewUrl && this.logoPreviewUrl.startsWith('blob:')) {
@@ -549,26 +557,42 @@ export default {
       });
       this.snackbar.notify({ message: 'Hodiny skopírované na všetky dni.', variant: 'success' });
     },
+    loadOpenHours() {
+      this.$store.dispatch('restaurant/fetchOpenHours').then((hours) => {
+        this.open_hours = hours;
+      });
+    },
     updateHour(dayOfWeek, key, value) {
       const index = dayOfWeek - 1;
       if (!this.open_hours[index]) return;
       this.open_hours[index][key] = value;
     },
 
-    toggleDay(dayOfWeek, isOpen) {
+    async toggleDay(dayOfWeek, isOpen) {
       const index = dayOfWeek - 1;
       if (!this.open_hours[index]) return;
       this.open_hours[index].is_closed = !isOpen;
       if (!isOpen) {
         this.open_hours[index].open_time = '';
         this.open_hours[index].close_time = '';
+        await this.$store.dispatch('restaurant/removeDayOpenHours', {
+          hours: this.open_hours,
+          dayOfWeek,
+        });
       }
     },
     dayLabel(day) {
       return this.dayLabels?.[day] || `Deň ${day}`;
     },
     saveHours() {
-      this.snackbar.notify({ message: 'Otváracie hodiny boli uložené.', variant: 'success' });
+      this.$store.dispatch('restaurant/saveOpenHours', { hours: this.open_hours }).then((saved) => {
+        this.open_hours = saved;
+      });
+    },
+    deleteHours() {
+      this.$store.dispatch('restaurant/deleteOpenHours').then((saved) => {
+        this.open_hours = saved;
+      });
     },
     saveLanguage() {
       const option = this.languageOptions.find((opt) => opt.value === this.language);
