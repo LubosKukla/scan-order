@@ -16,6 +16,27 @@ class BasketController extends Controller
         return response()->json($baskets);
     }
 
+    public function getItemsInBasket(Customer $customer, Basket $basket)
+    {
+        $loginCustomer = auth()->user();
+
+        if ($loginCustomer->id !== $customer->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($basket->customer_id !== $customer->id) {
+            return response()->json(['message' => 'Basket does not belong to this customer'], 404);
+        }
+
+        $basket->load(['basketItems', 'basketItems.menuItem']);
+
+        return response()->json([
+            'basket' => $basket,
+            'items'  => $basket->basketItems,
+        ]);
+    }
+
+
     public function addItemToBasket(Request $request, Customer $customer, Restaurant $restaurant)
     {
         $customerId = $customer->id;

@@ -9,6 +9,7 @@ import employees from './modules/employees';
 import roles from './modules/roles';
 import pricing from './modules/pricing';
 import settings from './modules/settings';
+import basket from './modules/basket';
 
 export default createStore({
   modules: {
@@ -22,5 +23,6 @@ export default createStore({
     roles,
     pricing,
     settings,
+    basket,
   },
 });

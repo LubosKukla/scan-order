@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
             CustomerSeeder::class,
             RestaurantSeeder::class,
+            MenuItemSeeder::class,
+
             // ... dalsie seedre
         ]);
         // \App\Models\User::factory()->create([

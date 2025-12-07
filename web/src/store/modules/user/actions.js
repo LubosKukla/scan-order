@@ -14,6 +14,9 @@ function isValidPassword(password) {
 
 const actions = {
   async prihlasenie({ dispatch, getters, state }, credentials) {
+    if (getters.isLoggedIn) {
+      await dispatch('odhlasenie');
+    }
     try {
       if (getters.isLoggedIn) {
         snackbar.notify({

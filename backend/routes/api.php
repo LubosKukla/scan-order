@@ -49,6 +49,9 @@ Route::middleware(['auth:sanctum', 'customer'])
         Route::post('/restaurants/{restaurant}/basket/items', [BasketController::class, 'addItemToBasket']);
         Route::put('/baskets/{basket}/items/{item}', [BasketController::class, 'updateItemInBasket']);
         Route::delete('/baskets/{basket}/items/{item}', [BasketController::class, 'removeItemFromBasket']);
+
+        //Polozky v kosiku
+        Route::get('/baskets/{basket}/items', [BasketController::class, 'getItemsInBasket']);
     });
 
 

@@ -33,7 +33,7 @@ class Paid
         if (! $restaurant) {
             return response()->json(['message' => 'Restaurant not found for this user.'], 403);
         }
-
+        //mozno vymazat
         // Povoliť prístup k otváracím hodinám aj bez aktívneho billing záznamu
         if ($request->is('api/restaurants/*/openhours')) {
             return $next($request);
