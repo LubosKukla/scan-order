@@ -173,15 +173,31 @@
 
         <div class="space-y-2">
           <div
-            v-for="day in openingHours"
-            :key="day.key"
+            v-for="day in open_hours"
+            :key="day.day_of_week"
             class="grid items-center gap-3 md:grid-cols-[140px_1fr_1fr_auto]"
           >
-            <p class="text-sm font-semibold text-deep">{{ day.label }}</p>
-            <BaseInput v-model="day.from" type="time" label="" :disabled="!day.open" />
-            <BaseInput v-model="day.to" type="time" label="" :disabled="!day.open" />
+            <p class="text-sm font-semibold text-deep">{{ dayLabel(day.day_of_week) }}</p>
+            <BaseInput
+              :modelValue="day.open_time"
+              type="time"
+              label=""
+              :disabled="day.is_closed"
+              @update:modelValue="updateHour(day.day_of_week, 'open_time', $event)"
+            />
+            <BaseInput
+              :modelValue="day.close_time"
+              type="time"
+              label=""
+              :disabled="day.is_closed"
+              @update:modelValue="updateHour(day.day_of_week, 'close_time', $event)"
+            />
             <div class="flex justify-end">
-              <BaseToggle v-model="day.open" :label="day.open ? 'Otvorené' : 'Zatvorené'" />
+              <BaseToggle
+                :modelValue="!day.is_closed"
+                :label="day.is_closed ? 'Zatvorené' : 'Otvorené'"
+                @update:modelValue="toggleDay(day.day_of_week, $event)"
+              />
             </div>
           </div>
         </div>
@@ -404,15 +420,24 @@ export default {
         provider: 'Stripe',
         description: 'Bezpečná platobná brána pre online platby',
       },
-      openingHours: [
-        { key: 'mon', label: 'Pondelok', from: '10:00', to: '22:00', open: true },
-        { key: 'tue', label: 'Utorok', from: '10:00', to: '22:00', open: true },
-        { key: 'wed', label: 'Streda', from: '10:00', to: '22:00', open: true },
-        { key: 'thu', label: 'Štvrtok', from: '10:00', to: '22:00', open: true },
-        { key: 'fri', label: 'Piatok', from: '10:00', to: '23:00', open: true },
-        { key: 'sat', label: 'Sobota', from: '10:00', to: '23:00', open: true },
-        { key: 'sun', label: 'Nedeľa', from: '11:00', to: '21:00', open: true },
+      open_hours: [
+        { day_of_week: 1, open_time: '08:00', close_time: '22:00', is_closed: false },
+        { day_of_week: 2, open_time: '08:00', close_time: '22:00', is_closed: false },
+        { day_of_week: 3, open_time: '08:00', close_time: '22:00', is_closed: false },
+        { day_of_week: 4, open_time: '08:00', close_time: '22:00', is_closed: false },
+        { day_of_week: 5, open_time: '08:00', close_time: '22:00', is_closed: false },
+        { day_of_week: 6, open_time: '', close_time: '', is_closed: true },
+        { day_of_week: 7, open_time: '', close_time: '', is_closed: true },
       ],
+      dayLabels: {
+        1: 'Pondelok',
+        2: 'Utorok',
+        3: 'Streda',
+        4: 'Štvrtok',
+        5: 'Piatok',
+        6: 'Sobota',
+        7: 'Nedeľa',
+      },
       language: 'sk',
       languageOptions: [
         { label: 'Slovenčina', value: 'sk' },
@@ -515,15 +540,32 @@ export default {
       this.snackbar.notify({ message: 'Zobrazenie histórie platieb.', variant: 'info' });
     },
     copyFirstDayToAll() {
-      if (!this.openingHours.length) return;
-      const source = this.openingHours[0];
-      this.openingHours = this.openingHours.map((day) => ({
-        ...day,
-        from: source.from,
-        to: source.to,
-        open: source.open,
-      }));
+      if (!this.open_hours.length) return;
+      const source = this.open_hours[0];
+      this.open_hours.forEach((day) => {
+        day.open_time = source.open_time;
+        day.close_time = source.close_time;
+        day.is_closed = source.is_closed;
+      });
       this.snackbar.notify({ message: 'Hodiny skopírované na všetky dni.', variant: 'success' });
+    },
+    updateHour(dayOfWeek, key, value) {
+      const index = dayOfWeek - 1;
+      if (!this.open_hours[index]) return;
+      this.open_hours[index][key] = value;
+    },
+
+    toggleDay(dayOfWeek, isOpen) {
+      const index = dayOfWeek - 1;
+      if (!this.open_hours[index]) return;
+      this.open_hours[index].is_closed = !isOpen;
+      if (!isOpen) {
+        this.open_hours[index].open_time = '';
+        this.open_hours[index].close_time = '';
+      }
+    },
+    dayLabel(day) {
+      return this.dayLabels?.[day] || `Deň ${day}`;
     },
     saveHours() {
       this.snackbar.notify({ message: 'Otváracie hodiny boli uložené.', variant: 'success' });
