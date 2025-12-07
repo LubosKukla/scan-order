@@ -27,7 +27,7 @@ const SAMPLE_GROUPS = [
     title: 'Pizza',
     items: [
       {
-        id: 101,
+        id: 1,
         name: 'Pizza Caroffia',
         desc: 'Paradajková omáčka, mozzarella, šunka',
         price: 4.99,
@@ -36,7 +36,7 @@ const SAMPLE_GROUPS = [
         isFav: false,
       },
       {
-        id: 102,
+        id: 1,
         name: 'Quattro Formaggi',
         desc: 'Štyri druhy syra',
         price: 6.5,
@@ -45,7 +45,7 @@ const SAMPLE_GROUPS = [
         isFav: false,
       },
       {
-        id: 103,
+        id: 1,
         name: 'Diavola',
         desc: 'Pikantná saláma, chilli',
         price: 6.9,
@@ -60,7 +60,7 @@ const SAMPLE_GROUPS = [
     title: 'Burgery',
     items: [
       {
-        id: 201,
+        id: 1,
         name: 'Burger San Giovanni',
         desc: 'Hovädzie, cheddar, jalapeños',
         price: 7.5,
@@ -69,7 +69,7 @@ const SAMPLE_GROUPS = [
         isFav: true,
       },
       {
-        id: 202,
+        id: 1,
         name: 'BBQ Bacon Burger',
         desc: 'BBQ omáčka, slanina',
         price: 8.2,
@@ -78,7 +78,7 @@ const SAMPLE_GROUPS = [
         isFav: false,
       },
       {
-        id: 203,
+        id: 1,
         name: 'Veggie Burger',
         desc: 'Cícerová placka, avokádo',
         price: 7.1,
@@ -111,7 +111,7 @@ export default {
         this.$route.query.restaurantId ||
         localStorage.getItem('restaurantId') ||
         this.currentUser?.restaurants?.[0]?.id ||
-        null
+        1 // fallback na reštauráciu s ID 1
       );
     },
     cartCount() {

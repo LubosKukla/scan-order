@@ -88,7 +88,7 @@ class BasketController extends Controller
     }
 
 
-    public function removeItemFromBasket(Customer $customer, Basket $basket, Basket_item $itemId)
+    public function removeItemFromBasket(Customer $customer, Basket $basket, Basket_item $item)
     {
         $loginCustomer = auth()->user();
 
@@ -96,14 +96,10 @@ class BasketController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        if ($itemId->basket_id !== $basket->id) {
+        if ($item->basket_id !== $basket->id) {
             return response()->json(['message' => 'Item does not belong to the specified basket'], 400);
         }
 
-        $item = Basket_item::find($itemId->id);
-        if (!$item) {
-            return response()->json(['message' => 'Item not found in basket'], 404);
-        }
         $item->delete();
         $basket->load('basketItems');
         $basket->update([
