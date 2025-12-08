@@ -142,6 +142,7 @@ var actions = {
     var payload = makePayload(fullHours);
 
     try {
+      await axios.get('/sanctum/csrf-cookie');
       var res = await axios.get('/api/restaurants/' + id + '/openhours');
       var existing = res.data.open_hours || [];
 
@@ -174,6 +175,7 @@ var actions = {
     }
 
     try {
+      await axios.get('/sanctum/csrf-cookie');
       await axios.delete('/api/restaurants/' + id + '/openhours');
       var defaults = getDefault(rootGetters);
       commit('SET_OPEN_HOURS', defaults);
