@@ -80,20 +80,22 @@
                 <ReviewTypeBadge :type="review.type" />
               </td>
               <td class="padding-item font-semibold">
-                {{ review.reviewer }}
+                {{ reviewerName(review) }}
               </td>
               <td class="padding-item">
                 <ReviewRatingDisplay :rating="review.rating" />
               </td>
               <td class="padding-item">
-                <p>{{ review.comment }}</p>
-                <p v-if="review.dishDescription" class="text-xs text-deep/60">{{ review.dishDescription }}</p>
+                <p>{{ reviewText(review) }}</p>
+                <p v-if="reviewDishDescription(review)" class="text-xs text-deep/60">
+                  {{ reviewDishDescription(review) }}
+                </p>
               </td>
               <td class="padding-item text-deep/70">
-                {{ formatDate(review.date) }}
+                {{ formatDate(reviewDateValue(review)) }}
               </td>
               <td class="padding-item">
-                <ReviewSourceTag :type="review.sourceType" :label="review.sourceLabel" />
+                <ReviewSourceTag :type="reviewSourceType(review)" :label="reviewSourceLabel(review)" />
               </td>
               <td class="padding-item text-right">
                 <div class="flex items-center justify-end gap-2">
@@ -106,7 +108,7 @@
                   <BaseButton
                     variant="noBackground"
                     icon="reply"
-                    class="text-deep/70 hover:text-primary"
+                    :class="replyButtonClass(review)"
                     @click="openReply(review)"
                   />
                   <BaseButton
@@ -134,15 +136,17 @@
         >
           <div class="flex md:items-center justify-between flex-col gap-2 md:flex-row items-start">
             <ReviewTypeBadge :type="review.type" />
-            <ReviewSourceTag :type="review.sourceType" :label="review.sourceLabel" />
+            <ReviewSourceTag :type="reviewSourceType(review)" :label="reviewSourceLabel(review)" />
           </div>
           <div>
-            <p class="font-semibold text-deep">{{ review.reviewer }}</p>
-            <p class="text-xs text-deep/90">{{ formatDate(review.date) }}</p>
+            <p class="font-semibold text-deep">{{ reviewerName(review) }}</p>
+            <p class="text-xs text-deep/90">{{ formatDate(reviewDateValue(review)) }}</p>
           </div>
           <ReviewRatingDisplay :rating="review.rating" />
-          <p class="text-sm text-deep">{{ review.comment }}</p>
-          <p v-if="review.dishDescription" class="text-xs text-deep/90">{{ review.dishDescription }}</p>
+          <p class="text-sm text-deep">{{ reviewText(review) }}</p>
+          <p v-if="reviewDishDescription(review)" class="text-xs text-deep/90">
+            {{ reviewDishDescription(review) }}
+          </p>
 
           <div class="flex items-center justify-end gap-2">
             <BaseButton
@@ -154,7 +158,7 @@
             <BaseButton
               variant="noBackground"
               icon="reply"
-              class="text-deep/70 hover:text-primary"
+              :class="replyButtonClass(review)"
               @click="openReply(review)"
             />
             <BaseButton
@@ -176,18 +180,42 @@
         <p class="text-sm font-semibold text-deep">{{ typeLabel(selectedReview.type) }}</p>
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-lg font-semibold text-deep">{{ selectedReview.reviewer }}</p>
-            <p class="text-xs text-deep/90">{{ formatDate(selectedReview.date) }}</p>
+            <p class="text-lg font-semibold text-deep">{{ reviewerName(selectedReview) }}</p>
+            <p class="text-xs text-deep/90">{{ formatDate(reviewDateValue(selectedReview)) }}</p>
           </div>
-          <ReviewSourceTag :type="selectedReview.sourceType" :label="selectedReview.sourceLabel" />
+          <ReviewSourceTag :type="reviewSourceType(selectedReview)" :label="reviewSourceLabel(selectedReview)" />
         </div>
         <ReviewRatingDisplay :rating="selectedReview.rating" showValue="true" />
         <BaseCard class="bg-ink/40 border-none">
-          <p class="text-sm text-deep">{{ selectedReview.comment }}</p>
-          <p v-if="selectedReview.dishDescription" class="text-xs text-deep/80 mt-2">
-            {{ selectedReview.dishDescription }}
+          <p class="text-sm text-deep">{{ reviewText(selectedReview) }}</p>
+          <p v-if="reviewDishDescription(selectedReview)" class="text-xs text-deep/80 mt-2">
+            {{ reviewDishDescription(selectedReview) }}
           </p>
         </BaseCard>
+        <div v-if="reviewResponses(selectedReview).length" class="space-y-3">
+          <p class="text-sm font-semibold text-deep">Odpovede</p>
+          <div class="space-y-3">
+            <BaseCard
+              v-for="responseItem in reviewResponses(selectedReview)"
+              :key="responseItem.id"
+              class="bg-white border border-ink/20"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="space-y-1">
+                  <p class="text-xs font-semibold text-deep">{{ responseAuthor(responseItem) }}</p>
+                  <p class="text-xs text-deep/70">{{ formatDate(responseDateValue(responseItem)) }}</p>
+                </div>
+                <BaseButton
+                  variant="noBackground"
+                  icon="trash"
+                  class="text-danger hover:text-danger"
+                  @click="openDeleteResponse(responseItem)"
+                />
+              </div>
+              <p class="text-sm text-deep mt-2">{{ reviewText(responseItem) }}</p>
+            </BaseCard>
+          </div>
+        </div>
       </div>
       <template #footer>
         <BaseButton variant="secondary" @click="viewModalVisible = false">Zavrieť</BaseButton>
@@ -199,14 +227,14 @@
         <div class="flex items-start justify-between gap-4">
           <div>
             <p class="text-sm font-semibold text-deep/70">{{ typeLabel(selectedReview.type) }}</p>
-            <p class="text-lg font-semibold text-deep">{{ selectedReview.reviewer }}</p>
-            <p class="text-xs text-deep/60">{{ formatDate(selectedReview.date) }}</p>
+            <p class="text-lg font-semibold text-deep">{{ reviewerName(selectedReview) }}</p>
+            <p class="text-xs text-deep/60">{{ formatDate(reviewDateValue(selectedReview)) }}</p>
           </div>
-          <ReviewSourceTag :type="selectedReview.sourceType" :label="selectedReview.sourceLabel" />
+          <ReviewSourceTag :type="reviewSourceType(selectedReview)" :label="reviewSourceLabel(selectedReview)" />
         </div>
         <ReviewRatingDisplay :rating="selectedReview.rating" showValue="true" />
         <BaseCard class="bg-ink/40 border-none">
-          <p class="text-sm text-deep">{{ selectedReview.comment }}</p>
+          <p class="text-sm text-deep">{{ reviewText(selectedReview) }}</p>
         </BaseCard>
         <div class="space-y-2">
           <BaseTextarea
@@ -216,6 +244,7 @@
             rows="4"
           />
         </div>
+        <!--
         <BaseCard class="flex items-center justify-between">
           <div>
             <p class="text-sm font-semibold text-deep">Zobraziť odpoveď verejne</p>
@@ -223,6 +252,7 @@
           </div>
           <BaseToggle v-model="replyForm.public" />
         </BaseCard>
+        -->
       </div>
       <template #footer>
         <BaseButton variant="secondary" @click="replyModalVisible = false">Zavrieť</BaseButton>
@@ -234,7 +264,7 @@
       <div class="space-y-3">
         <p class="text-sm text-deep">
           Ste si istý, že chcete odstrániť túto recenziu?
-          <strong v-if="selectedReview">{{ selectedReview.reviewer }}</strong>
+          <strong v-if="deleteTarget">{{ responseAuthor(deleteTarget) }}</strong>
         </p>
         <p class="text-xs text-deep/60">Táto akcia je nevratná.</p>
       </div>
@@ -254,90 +284,28 @@ import BaseInput from '@/components/global/inputs/BaseInput.vue';
 import BaseSelect from '@/components/global/inputs/BaseSelect.vue';
 import BaseButton from '@/components/global/buttons/BaseButton.vue';
 import BaseTextarea from '@/components/global/inputs/BaseTextarea.vue';
-import BaseToggle from '@/components/global/inputs/BaseToggle.vue';
+// import BaseToggle from '@/components/global/inputs/BaseToggle.vue';
 import BaseModal from '@/components/global/containers/BaseModal.vue';
 import AdminPageHeader from '@/components/layout/funkcionality/AdminPageHeader.vue';
 import ReviewTypeBadge from '@/components/global/feedback/ReviewTypeBadge.vue';
 import ReviewRatingDisplay from '@/components/global/feedback/ReviewRatingDisplay.vue';
 import ReviewSourceTag from '@/components/global/feedback/ReviewSourceTag.vue';
 
-const SAMPLE_REVIEWS = [
-  {
-    id: 1,
-    type: 'restaurant',
-    reviewer: 'Jana Nováková',
-    rating: 4.9,
-    comment: 'Výborné jedlo, skvelá obsluha a príjemné prostredie. Určite sa vrátime!',
-    date: '2025-11-01',
-    sourceType: 'qr',
-    sourceLabel: 'QR - Stôl 4',
-    responded: true,
-  },
-  {
-    id: 2,
-    type: 'dish',
-    reviewer: 'Peter Horváth',
-    rating: 4.1,
-    comment: 'Steak bol chutný, ale trochu tuhší ako som očakával. Inak super!',
-    dishDescription: 'Jedlo: Hovädzí steak s omáčkou',
-    date: '2025-11-02',
-    sourceType: 'qr',
-    sourceLabel: 'QR - Stôl 2',
-    responded: false,
-  },
-  {
-    id: 3,
-    type: 'restaurant',
-    reviewer: 'Anonymous',
-    rating: 4.7,
-    comment: 'Najlepšia reštaurácia v meste! Musíte vyskúšať ich gnocchi.',
-    date: '2025-11-03',
-    sourceType: 'online',
-    sourceLabel: 'Online',
-    responded: true,
-  },
-  {
-    id: 4,
-    type: 'dish',
-    reviewer: 'Martina Kováčová',
-    rating: 4.8,
-    comment: 'Najlepšie gnocchi, aké som jedla! Perfektná konzistencia a chuť.',
-    dishDescription: 'Jedlo: Gnocchi so špenátom',
-    date: '2025-11-03',
-    sourceType: 'qr',
-    sourceLabel: 'QR - Terasa 1',
-    responded: true,
-  },
-  {
-    id: 5,
-    type: 'restaurant',
-    reviewer: 'Tomáš Lukáč',
-    rating: 3.9,
-    comment: 'Jedlo bolo dobré, ale čakali sme dosť dlho. Mohlo by to byť rýchlejšie.',
-    date: '2025-10-28',
-    sourceType: 'qr',
-    sourceLabel: 'QR - Stôl 7',
-    responded: false,
-  },
-  {
-    id: 6,
-    type: 'dish',
-    reviewer: 'Eva Szabová',
-    rating: 4.5,
-    comment: 'Dezert bol absolútne fantastický! Určite si dám znova.',
-    dishDescription: 'Jedlo: Tiramisu',
-    date: '2025-10-29',
-    sourceType: 'online',
-    sourceLabel: 'Online',
-    responded: false,
-  },
-];
-
 const RATING_OPTIONS = [
   { label: 'Všetky hodnotenia', value: 'all' },
   { label: '5 hviezdičiek', value: '5' },
   { label: '4 hviezdičky a viac', value: '4' },
   { label: '3 hviezdičky a viac', value: '3' },
+  { label: '2 a menej', value: '2_or_less' },
+];
+const PERIOD_OPTIONS = [
+  { label: 'Všetky mesiace', value: 'all' },
+  { label: 'Posledný mesiac', value: 'last_month' },
+  { label: 'Posledný kvartál', value: 'last_quarter' },
+  { label: 'Posledný rok', value: 'last_year' },
+  { label: 'Minulý mesiac', value: 'prev_month' },
+  { label: 'Minulý kvartál', value: 'prev_quarter' },
+  { label: 'Minulý rok', value: 'prev_year' },
 ];
 
 export default {
@@ -349,7 +317,7 @@ export default {
     BaseSelect,
     BaseButton,
     BaseTextarea,
-    BaseToggle,
+    // BaseToggle,
     BaseModal,
     ReviewTypeBadge,
     ReviewRatingDisplay,
@@ -361,43 +329,44 @@ export default {
       tabs: [
         { key: 'all', label: 'Všetky' },
         { key: 'restaurant', label: 'Reštaurácia' },
-        { key: 'dish', label: 'Jedlá' },
+        { key: 'menu_item', label: 'Jedlá' },
       ],
       activeTab: 'all',
-      reviews: SAMPLE_REVIEWS,
       filters: {
         search: '',
         rating: 'all',
         period: 'all',
       },
       ratingOptions: RATING_OPTIONS,
-      currentMonthKey: '2025-11',
+      searchTimer: null,
       selectedReview: null,
       replyModalVisible: false,
       viewModalVisible: false,
       deleteModalVisible: false,
+      deleteTarget: null,
       replyForm: {
         message: '',
-        public: true,
       },
     };
   },
   computed: {
+    reviews() {
+      return this.$store.getters['reviews/reviews'] || [];
+    },
+    stats() {
+      return this.$store.getters['reviews/stats'] || {};
+    },
     averageRating() {
-      if (!this.reviews.length) return 0;
-      const total = this.reviews.reduce((sum, review) => sum + review.rating, 0);
-      return total / this.reviews.length;
+      return Number(this.stats.average_rating) || 0;
     },
     totalReviews() {
-      return this.reviews.length;
+      return Number(this.stats.total_reviews) || 0;
     },
     reviewsThisMonth() {
-      return this.reviews.filter((review) => this.reviewPeriodKey(review) === this.currentMonthKey).length;
+      return Number(this.stats.reviews_this_month) || 0;
     },
     responseRate() {
-      if (!this.reviews.length) return 0;
-      const replied = this.reviews.filter((review) => review.responded).length;
-      return Math.round((replied / this.reviews.length) * 100);
+      return Number(this.stats.response_rate) || 0;
     },
     statCards() {
       return [
@@ -409,51 +378,91 @@ export default {
     },
     //generated by ai
     monthOptions() {
-      const uniqueMonths = Array.from(new Set(this.reviews.map((review) => this.reviewPeriodKey(review)))).sort(
-        (a, b) => (a < b ? 1 : -1)
-      );
-      const formatter = new Intl.DateTimeFormat('sk-SK', { month: 'long', year: 'numeric' });
-      const formatted = uniqueMonths.map((value) => {
-        const [year, month] = value.split('-');
-        const date = new Date(Number(year), Number(month) - 1, 1);
-        return {
-          value,
-          label: formatter.format(date),
-        };
-      });
-      return [{ label: 'Všetky mesiace', value: 'all' }, ...formatted];
+      return PERIOD_OPTIONS;
     },
     filteredReviews() {
-      return this.reviews
-        .filter((review) => (this.activeTab === 'all' ? true : review.type === this.activeTab))
-        .filter((review) => {
-          if (this.filters.rating === 'all') return true;
-          if (this.filters.rating === '5') return Math.round(review.rating) === 5;
-          if (this.filters.rating === '4') return review.rating >= 4;
-          if (this.filters.rating === '3') return review.rating >= 3;
-          return true;
-        })
-        .filter((review) => {
-          if (this.filters.period === 'all') return true;
-          return this.reviewPeriodKey(review) === this.filters.period;
-        })
-        .filter((review) => {
-          const query = this.filters.search.trim().toLowerCase();
-          if (!query) return true;
-          return [review.reviewer, review.comment, review.dishDescription]
-            .filter(Boolean)
-            .some((value) => value.toLowerCase().includes(query));
-        });
+      return this.reviews;
     },
   },
   methods: {
+    async loadReviews() {
+      try {
+        await this.$store.dispatch('reviews/fetchReviews', {
+          search: this.filters.search,
+          rating: this.filters.rating,
+          period: this.filters.period,
+          type: this.activeTab,
+        });
+      } catch (err) {
+        // chyby su osetrene v store
+      }
+    },
+    async loadStats() {
+      try {
+        await this.$store.dispatch('reviews/fetchReviewStats', {
+          type: this.activeTab,
+        });
+      } catch (err) {
+        // chyby su osetrene v store
+      }
+    },
+    scheduleLoadReviews() {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(() => {
+        this.loadReviews();
+      }, 300);
+    },
     tabClass(key) {
       return key === this.activeTab
         ? 'bg-white text-primary shadow-sm'
         : 'bg-white/40 text-deep/70 hover:bg-white hover:text-primary';
     },
     typeLabel(type) {
-      return type === 'dish' ? 'Recenzia jedla' : 'Recenzia reštaurácie';
+      return type === 'menu_item' ? 'Recenzia jedla' : 'Recenzia reštaurácie';
+    },
+    reviewerName(review) {
+      const customer = review.customer || {};
+      const name = [customer.name, customer.surname].filter(Boolean).join(' ');
+      return name || 'Anonymous';
+    },
+    reviewText(review) {
+      return review.text || '';
+    },
+    reviewDateValue(review) {
+      return review.created_at || review.updated_at || null;
+    },
+    reviewDishDescription(review) {
+      const menuItem = review.menu_item || review.menuItem;
+      return menuItem ? 'Jedlo: ' + menuItem.name : '';
+    },
+    reviewSourceType() {
+      return 'online';
+    },
+    reviewSourceLabel() {
+      return 'Online';
+    },
+    replyButtonClass(review) {
+      return this.reviewRestaurantResponse(review)
+        ? 'text-primary'
+        : 'text-deep/70 hover:text-primary';
+    },
+    reviewRestaurantResponse(review) {
+      var responses = this.reviewResponses(review);
+      for (var i = 0; i < responses.length; i++) {
+        var response = responses[i];
+        if (!response.customer_id) return response;
+      }
+      return null;
+    },
+    reviewResponses(review) {
+      return review.responses || [];
+    },
+    responseAuthor(response) {
+      if (!response.customer_id) return 'Reštaurácia';
+      return this.reviewerName(response);
+    },
+    responseDateValue(response) {
+      return response.created_at || response.updated_at || null;
     },
     formatDate(dateValue) {
       if (!dateValue) return '';
@@ -463,30 +472,72 @@ export default {
         year: 'numeric',
       }).format(new Date(dateValue));
     },
-    reviewPeriodKey(review) {
-      const date = new Date(review.date);
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      return `${date.getFullYear()}-${month}`;
-    },
     openView(review) {
       this.selectedReview = review;
       this.viewModalVisible = true;
     },
     openReply(review) {
       this.selectedReview = review;
-      this.replyForm = { message: '', public: true };
+      var response = this.reviewRestaurantResponse(review);
+      this.replyForm = { message: response ? response.text : '' };
       this.replyModalVisible = true;
     },
     openDelete(review) {
-      this.selectedReview = review;
+      this.deleteTarget = review;
       this.deleteModalVisible = true;
     },
-    submitReply() {
-      if (!this.replyForm.message.trim()) return;
-      this.replyModalVisible = false;
+    openDeleteResponse(response) {
+      this.deleteTarget = response;
+      this.deleteModalVisible = true;
     },
-    confirmDelete() {
+    async submitReply() {
+      if (!this.replyForm.message.trim() || !this.selectedReview) return;
+      var response = this.reviewRestaurantResponse(this.selectedReview);
+      var ok = response
+        ? await this.$store.dispatch('reviews/updateResponse', { reviewId: response.id, text: this.replyForm.message })
+        : await this.$store.dispatch('reviews/respondReview', {
+            reviewId: this.selectedReview.id,
+            text: this.replyForm.message,
+          });
+      if (!ok) return;
+      this.replyModalVisible = false;
+      await this.loadReviews();
+      await this.loadStats();
+    },
+    async confirmDelete() {
+      if (!this.deleteTarget) return;
+      var ok = await this.$store.dispatch('reviews/deleteReview', this.deleteTarget.id);
+      if (!ok) return;
+      if (this.selectedReview && this.deleteTarget.id === this.selectedReview.id) {
+        this.viewModalVisible = false;
+        this.selectedReview = null;
+      }
+      this.deleteTarget = null;
       this.deleteModalVisible = false;
+      await this.loadReviews();
+      await this.loadStats();
+      this.viewModalVisible = false;
+    },
+  },
+  created() {
+    this.loadReviews();
+    this.loadStats();
+  },
+  watch: {
+    'filters.search': function () {
+      this.scheduleLoadReviews();
+    },
+    'filters.rating': function () {
+      this.loadReviews();
+      this.loadStats();
+    },
+    'filters.period': function () {
+      this.loadReviews();
+      this.loadStats();
+    },
+    activeTab: function () {
+      this.loadReviews();
+      this.loadStats();
     },
   },
 };

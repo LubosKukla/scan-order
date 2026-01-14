@@ -85,6 +85,7 @@ import RegisterStepTwo from '../../components/admin/register/RegisterStepTwo.vue
 import RegisterStepThree from '../../components/admin/register/RegisterStepThree.vue';
 import { useSnackbar } from '../../composables/useSnackbar';
 
+//rexegex code from AI
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\+?\d{8,14}$/;
 const ZIP_REGEX = /^\d{3}\s?\d{2}$/;

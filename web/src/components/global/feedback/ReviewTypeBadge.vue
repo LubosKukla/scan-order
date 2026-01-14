@@ -15,7 +15,7 @@ const TYPE_CONFIG = {
     classes: 'bg-primary text-white shadow-sm',
     icon: faStore,
   },
-  dish: {
+  menu_item: {
     label: 'Jedlo',
     classes: 'bg-deep/80 text-white shadow-sm',
     icon: faDrumstickBite,
@@ -29,7 +29,7 @@ export default {
     type: {
       type: String,
       default: 'restaurant',
-      validator: (value) => ['restaurant', 'dish'].includes(value),
+      validator: (value) => ['restaurant', 'menu_item'].includes(value),
     },
     label: {
       type: String,

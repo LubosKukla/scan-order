@@ -13,6 +13,7 @@ class Review extends Model
         'menu_item_id',
         'customer_id',
         'restaurant_id',
+        'response_id',
         'type',
         'text',
         'rating',
@@ -29,5 +30,15 @@ class Review extends Model
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);
+    }
+
+    public function responseTo()
+    {
+        return $this->belongsTo(Review::class, 'response_id');
+    }
+
+    public function responses()
+    {
+        return $this->hasMany(Review::class, 'response_id');
     }
 }

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             CustomerSeeder::class,
             RestaurantSeeder::class,
             MenuItemSeeder::class,
+            ReviewSeeder::class,
 
             // ... dalsie seedre
         ]);

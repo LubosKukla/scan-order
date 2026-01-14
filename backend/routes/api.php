@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BasketController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RestaurantBilling;
 use App\Http\Controllers\RestaurantController;
 use App\Models\Customer;
@@ -24,12 +25,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'me']);
+    Route::post('/reviews/{review}/response', [ReviewController::class, 'respond']);
 });
+
+Route::middleware(['auth:sanctum', 'restaurant'])->group(function () {
+    Route::delete('/reviews/{review}', [ReviewController::class, 'deleteReview']);
+    Route::put('/reviews/{review}/response', [ReviewController::class, 'updateResponse']);
+});
+
+Route::middleware(['auth:sanctum', 'customer'])->group(function () {
+    Route::post('/reviews', [ReviewController::class, 'createReview']);
+});
+
 
 
 Route::group([], function () {
     Route::get('/types/restaurant', [RestaurantController::class, 'getTypes']);
     Route::get('/types/kitchen', [RestaurantController::class, 'getKitchens']);
+    Route::get('/public/restaurants/{restaurant}/reviews', [RestaurantController::class, 'getPublicReviews']);
 });
 
 
@@ -56,11 +69,16 @@ Route::middleware(['auth:sanctum', 'customer'])
 
 
 
-
-
 Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
     ->group(function () {
         Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show']);
+    });
+
+Route::middleware(['auth:sanctum', 'restaurant'])
+    ->prefix('restaurants/{restaurant}')
+    ->group(function () {
+        Route::get('/reviews', [RestaurantController::class, 'getReviews']);
+        Route::get('/reviews/stats', [RestaurantController::class, 'getReviewStats']);
     });
 
 Route::middleware(['auth:sanctum', 'restaurant', 'paid'])

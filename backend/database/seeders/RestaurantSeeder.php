@@ -80,6 +80,27 @@ class RestaurantSeeder extends Seeder
                 ],
                 'type' => 'Restaurant',
             ],
+            [
+                'user' => [
+                    'email'    => 'test@test.sk',
+                    'phone'    => '+421904004004',
+                    'password' => 'testtest',
+                ],
+                'profile' => [
+                    'name'            => 'Test Restauracia',
+                    'name_boss'       => 'Test Tester',
+                    'description'     => 'Testovacia restauracia pre prihlasenie.',
+                    'number_of_tables' => 10,
+                    'is_active'       => true,
+                ],
+                'address' => [
+                    'street'             => 'Testovacia',
+                    'number_of_building' => '10',
+                    'PSC'                => '01001',
+                    'city'               => 'Zilina',
+                ],
+                'type' => 'Test',
+            ],
         ];
 
         foreach ($restaurants as $restaurantData) {
