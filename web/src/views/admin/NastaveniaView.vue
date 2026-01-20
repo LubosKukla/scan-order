@@ -20,31 +20,67 @@
         </div>
 
         <div class="grid gap-3 md:grid-cols-2">
-          <BaseInput v-model="profileForm.name" label="Názov reštaurácie" placeholder="Reštaurácia" required />
+          <BaseInput
+            v-model="profileForm.name"
+            label="Názov reštaurácie"
+            placeholder="Reštaurácia"
+            required
+            :error="errors.name"
+          />
           <BaseInput
             v-model="profileForm.owner"
             label="Meno majiteľa / zodpovednej osoby"
             placeholder="Meno a priezvisko"
             required
+            :error="errors.owner"
           />
-          <BaseInput v-model="profileForm.email" type="email" label="Email" placeholder="info@restauracia.sk" />
-          <BaseInput v-model="profileForm.phone" label="Telefónne číslo" placeholder="+421 900 000 000" />
+          <BaseInput
+            v-model="profileForm.email"
+            type="email"
+            label="Email"
+            placeholder="info@restauracia.sk"
+            required
+            :error="errors.email"
+          />
+          <BaseInput
+            v-model="profileForm.phone"
+            label="Telefónne číslo"
+            placeholder="+421 900 000 000"
+            required
+            :error="errors.phone"
+          />
           <div class="space-y-1">
-            <BaseSelect v-model="profileForm.restaurantType" label="Typ reštaurácie" :options="restaurantTypeOptions" />
+            <BaseSelect
+              v-model="profileForm.restaurantType"
+              label="Typ reštaurácie"
+              :options="restaurantTypeOptions"
+              option-label-key="type"
+              option-value-key="type"
+              :error="errors.restaurantType"
+            />
             <BaseInput
-              v-if="profileForm.restaurantType === 'other'"
+              v-if="profileForm.restaurantType === 'Ostatné'"
               v-model="profileForm.otherRestaurantType"
               label="Môj typ"
               placeholder="Napíšte vlastný typ reštaurácie"
+              :error="errors.otherRestaurantType"
             />
           </div>
           <div class="space-y-1">
-            <BaseSelect v-model="profileForm.cuisine" label="Typ kuchyne" :options="cuisineOptions" />
+            <BaseSelect
+              v-model="profileForm.cuisine"
+              label="Typ kuchyne"
+              :options="cuisineOptions"
+              option-label-key="type"
+              option-value-key="type"
+              :error="errors.cuisine"
+            />
             <BaseInput
-              v-if="profileForm.cuisine === 'other'"
+              v-if="profileForm.cuisine === 'Ostatné'"
               v-model="profileForm.otherCuisine"
               label="Môj typ"
               placeholder="Napíšte vlastný typ kuchyne"
+              :error="errors.otherCuisine"
             />
           </div>
         </div>
@@ -58,15 +94,26 @@
 
         <div class="grid gap-3 md:grid-cols-2">
           <div class="grid gap-3 md:col-span-2 md:grid-cols-2">
-            <BaseInput v-model="profileForm.address.street" label="Ulica a číslo" placeholder="Hlavná 123" />
-            <BaseInput v-model="profileForm.address.zip" label="PSČ" placeholder="811 01" />
-            <BaseInput v-model="profileForm.address.city" label="Mesto" placeholder="Bratislava" />
+            <BaseInput
+              v-model="profileForm.address.street"
+              label="Ulica a číslo"
+              placeholder="Hlavná 123"
+              :error="errors.addressStreet"
+            />
+            <BaseInput v-model="profileForm.address.zip" label="PSČ" placeholder="811 01" :error="errors.addressZip" />
+            <BaseInput
+              v-model="profileForm.address.city"
+              label="Mesto"
+              placeholder="Bratislava"
+              :error="errors.addressCity"
+            />
             <BaseInput
               v-model="profileForm.seats"
               type="number"
               label="Počet stolov (orientačne)"
               min="0"
               placeholder="20"
+              :error="errors.seats"
             />
           </div>
           <div class="space-y-3 rounded-xl bg-ink/30 p-4 md:grid-cols-2 md:col-span-2">
@@ -112,24 +159,28 @@
               label="Názov firmy"
               placeholder="Reštaurácia U Jozefa s.r.o."
               :disabled="!profileForm.billToCompany"
+              :error="errors.companyName"
             />
             <BaseInput
               v-model="profileForm.company.ico"
               label="IČO"
               placeholder="12345678"
               :disabled="!profileForm.billToCompany"
+              :error="errors.companyIco"
             />
             <BaseInput
               v-model="profileForm.company.dic"
               label="DIČ"
               placeholder="2012345678"
               :disabled="!profileForm.billToCompany"
+              :error="errors.companyDic"
             />
             <BaseInput
               v-model="profileForm.company.icDph"
               label="IČ DPH (SK)"
               placeholder="SK2012345678"
               :disabled="!profileForm.billToCompany"
+              :error="errors.companyIcDph"
             />
           </div>
         </div>
@@ -137,16 +188,37 @@
         <div class="space-y-3 rounded-xl border border-ink/40 bg-ink/10 p-4">
           <p class="text-base font-semibold text-deep">Fakturačné údaje</p>
           <div class="grid gap-3 md:grid-cols-2">
-            <BaseInput v-model="profileForm.billing.iban" label="Iban" placeholder="SK 01110 1565 1561 4894 4865" />
-            <BaseInput v-model="profileForm.billing.street" label="Ulica a číslo" placeholder="Hlavná 123" />
-            <BaseInput v-model="profileForm.billing.city" label="Mesto" placeholder="Bratislava" />
-            <BaseInput v-model="profileForm.billing.zip" label="PSČ" placeholder="811 01" />
-            <BaseInput v-model="profileForm.billing.country" label="Krajina" placeholder="Slovensko" />
+            <BaseInput
+              v-model="profileForm.billing.iban"
+              label="Iban"
+              placeholder="SK 01110 1565 1561 4894 4865"
+              :error="errors.billingIban"
+            />
+            <BaseInput
+              v-model="profileForm.billing.street"
+              label="Ulica a číslo"
+              placeholder="Hlavná 123"
+              :error="errors.billingStreet"
+            />
+            <BaseInput
+              v-model="profileForm.billing.city"
+              label="Mesto"
+              placeholder="Bratislava"
+              :error="errors.billingCity"
+            />
+            <BaseInput v-model="profileForm.billing.zip" label="PSČ" placeholder="811 01" :error="errors.billingZip" />
+            <BaseInput
+              v-model="profileForm.billing.country"
+              label="Krajina"
+              placeholder="Slovensko"
+              :error="errors.billingCountry"
+            />
             <BaseInput
               v-model="profileForm.billing.email"
               type="email"
               label="Fakturačný email"
               placeholder="billing@restauracia.sk"
+              :error="errors.billingEmail"
             />
           </div>
         </div>
@@ -248,15 +320,17 @@
               <p class="text-xs text-deep/70">Zákazníci nebudú môcť vytvárať objednávky.</p>
             </div>
             <BaseToggle
-              v-model="temporaryClosure"
+              :modelValue="!temporaryClosure"
               :label="temporaryClosure ? 'Dočasne zatvorené' : 'Otvorené'"
-              @change="handleTemporaryToggle"
+              @update:modelValue="handleTemporaryToggle"
             />
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-          <BaseButton variant="secondary" @click="deactivateModalVisible = true">Deaktivovať účet</BaseButton>
+          <BaseButton variant="secondary" @click="deactivateModalVisible = true">
+            {{ accountActive ? 'Deaktivovať účet' : 'Aktivovať účet' }}
+          </BaseButton>
           <BaseButton class="bg-danger text-white hover:bg-danger/90" @click="deleteConfirmVisible = true">
             Vymazať všetky dáta
           </BaseButton>
@@ -276,14 +350,17 @@
     </template>
   </BaseModal>
 
-  <BaseModal v-model="deactivateModalVisible" title="Deaktivovať účet">
+  <BaseModal v-model="deactivateModalVisible" :title="accountActive ? 'Deaktivovať účet' : 'Aktivovať účet'">
     <p class="text-deep">
-      Deaktiváciou účtu pozastavíte prístup pre všetkých členov tímu. Údaje zostanú zachované, kým účet znova
-      neaktivujete.
+      {{
+        accountActive
+          ? 'Deaktiváciou účtu pozastavíte prístup pre všetkých členov tímu. Údaje zostanú zachované, kým účet znova neaktivujete.'
+          : 'Aktiváciou účtu obnovíte prístup pre všetkých členov tímu.'
+      }}
     </p>
     <template #footer>
       <BaseButton variant="secondary" @click="deactivateModalVisible = false">Zrušiť</BaseButton>
-      <BaseButton @click="confirmDeactivate">Deaktivovať</BaseButton>
+      <BaseButton @click="confirmDeactivate">{{ accountActive ? 'Deaktivovať' : 'Aktivovať' }}</BaseButton>
     </template>
   </BaseModal>
 
@@ -342,6 +419,10 @@ import BaseUpload from '@/components/global/inputs/BaseUpload.vue';
 import BaseToggle from '@/components/global/inputs/BaseToggle.vue';
 import BaseModal from '@/components/global/containers/BaseModal.vue';
 import { useSnackbar } from '@/composables/useSnackbar';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\+?\d{8,14}$/;
+const ZIP_REGEX = /^\d{3}\s?\d{2}$/;
 
 export default {
   name: 'AdminNastaveniaView',
@@ -402,20 +483,34 @@ export default {
         seats: 20,
         logo: null,
       },
-      restaurantTypeOptions: [
-        { label: 'Reštaurácia', value: 'restaurant' },
-        { label: 'Kaviareň', value: 'cafe' },
-        { label: 'Catering', value: 'catering' },
-        { label: 'Food truck', value: 'foodtruck' },
-        { label: 'Ostatné', value: 'other' },
-      ],
-      cuisineOptions: [
-        { label: 'Slovenská', value: 'slovak' },
-        { label: 'Talianska', value: 'italian' },
-        { label: 'Ázijská', value: 'asian' },
-        { label: 'Medzinárodná', value: 'international' },
-        { label: 'Ostatné', value: 'other' },
-      ],
+      accountActive: true,
+      errors: {
+        name: '',
+        owner: '',
+        email: '',
+        phone: '',
+        restaurantType: '',
+        otherRestaurantType: '',
+        cuisine: '',
+        otherCuisine: '',
+        addressStreet: '',
+        addressCity: '',
+        addressZip: '',
+        seats: '',
+        companyName: '',
+        companyIco: '',
+        companyDic: '',
+        companyIcDph: '',
+        billingIban: '',
+        billingStreet: '',
+        billingCity: '',
+        billingZip: '',
+        billingCountry: '',
+        billingEmail: '',
+      },
+      hasTriedSave: false,
+      restaurantTypeOptions: [],
+      cuisineOptions: [],
       planInfo: {
         name: 'Platba - Najlepšia voľba',
         price: '47,97 €',
@@ -465,9 +560,100 @@ export default {
     };
   },
   mounted() {
+    this.loadOptions();
+    this.loadProfile();
     this.loadOpenHours();
   },
   watch: {
+    'profileForm.name': function () {
+      this.revalidateField('name');
+    },
+    'profileForm.owner': function () {
+      this.revalidateField('owner');
+    },
+    'profileForm.email': function () {
+      this.revalidateField('email');
+    },
+    'profileForm.phone': function () {
+      this.revalidateField('phone');
+    },
+    'profileForm.restaurantType': function (value) {
+      if (value !== 'Ostatné') {
+        this.profileForm.otherRestaurantType = '';
+        this.errors.otherRestaurantType = '';
+      }
+      this.revalidateField('restaurantType');
+      this.revalidateField('otherRestaurantType');
+    },
+    'profileForm.otherRestaurantType': function () {
+      this.revalidateField('otherRestaurantType');
+    },
+    'profileForm.cuisine': function (value) {
+      if (value !== 'Ostatné') {
+        this.profileForm.otherCuisine = '';
+        this.errors.otherCuisine = '';
+      }
+      this.revalidateField('cuisine');
+      this.revalidateField('otherCuisine');
+    },
+    'profileForm.otherCuisine': function () {
+      this.revalidateField('otherCuisine');
+    },
+    'profileForm.address.street': function () {
+      this.revalidateField('addressStreet');
+    },
+    'profileForm.address.city': function () {
+      this.revalidateField('addressCity');
+    },
+    'profileForm.address.zip': function () {
+      this.revalidateField('addressZip');
+    },
+    'profileForm.seats': function () {
+      this.revalidateField('seats');
+    },
+    'profileForm.billToCompany': function (value) {
+      if (!value) {
+        this.errors.companyName = '';
+        this.errors.companyIco = '';
+        this.errors.companyDic = '';
+        this.errors.companyIcDph = '';
+      }
+      this.revalidateField('companyName');
+      this.revalidateField('companyIco');
+      this.revalidateField('companyDic');
+      this.revalidateField('companyIcDph');
+    },
+    'profileForm.company.name': function () {
+      this.revalidateField('companyName');
+    },
+    'profileForm.company.ico': function () {
+      this.revalidateField('companyIco');
+    },
+    'profileForm.company.dic': function () {
+      this.revalidateField('companyDic');
+    },
+    'profileForm.company.icDph': function () {
+      this.revalidateField('companyIcDph');
+    },
+    'profileForm.billing.iban': function () {
+      this.revalidateField('billingIban');
+    },
+    'profileForm.billing.street': function () {
+      this.revalidateField('billingStreet');
+    },
+    'profileForm.billing.city': function () {
+      this.revalidateField('billingCity');
+    },
+    'profileForm.billing.zip': function () {
+      this.revalidateField('billingZip');
+    },
+    'profileForm.billing.country': function () {
+      this.revalidateField('billingCountry');
+    },
+    'profileForm.billing.email': function () {
+      this.revalidateField('billingEmail');
+    },
+    //zobrazenie loga (AI)
     'profileForm.logo'(newVal) {
       if (this.logoPreviewUrl && this.logoPreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(this.logoPreviewUrl);
@@ -489,11 +675,36 @@ export default {
     }
   },
   methods: {
-    saveAll() {
-      this.snackbar.notify({ message: 'Zmeny boli uložené.', variant: 'success' });
+    async loadOptions() {
+      var res = await this.$store.dispatch('settings/fetchOptions');
+      this.restaurantTypeOptions = (res && res.restaurantTypes) || [{ type: 'Ostatné' }];
+      this.cuisineOptions = (res && res.cuisineTypes) || [{ type: 'Ostatné' }];
+    },
+    async loadProfile() {
+      var profile = await this.$store.dispatch('settings/fetchProfile');
+      if (!profile) return;
+
+      this.profileForm = profile || this.profileForm;
+      if (profile.logo && this.profileForm.logo !== profile.logo) {
+        this.profileForm.logo = profile.logo;
+      }
+      if (typeof profile.temporaryClosed === 'boolean') {
+        this.temporaryClosure = profile.temporaryClosed;
+      }
+      if (typeof profile.isActive === 'boolean') {
+        this.accountActive = profile.isActive;
+      }
+      this.resetErrors();
+    },
+    async saveAll() {
+      var ok = await this.saveProfile();
+      if (ok) {
+        this.saveHours();
+      }
     },
     resetProfile() {
       this.clearLogoPreview();
+      this.resetErrors();
       this.profileForm = {
         name: 'Reštaurácia U lubosa a janka',
         owner: 'Jozef Novák',
@@ -532,8 +743,128 @@ export default {
       }
       this.logoPreviewUrl = '';
     },
-    saveProfile() {
-      this.snackbar.notify({ message: 'Profil reštaurácie bol uložený.', variant: 'success' });
+    async saveProfile() {
+      this.hasTriedSave = true;
+      if (!this.validateProfile()) {
+        this.notifyErrors('Vyplňte prosím povinné údaje.');
+        return false;
+      }
+
+      var saved = await this.$store.dispatch('settings/saveProfile', { profile: this.profileForm });
+      if (!saved) return false;
+
+      this.profileForm = saved;
+      this.resetErrors();
+      return true;
+    },
+    notifyErrors(message) {
+      this.snackbar.notify({ message, variant: 'danger' });
+    },
+    resetErrors() {
+      this.hasTriedSave = false;
+      Object.keys(this.errors).forEach((key) => {
+        this.errors[key] = '';
+      });
+    },
+    revalidateField(field) {
+      if (!this.hasTriedSave || !(field in this.errors)) return;
+      this.errors[field] = this.getFieldError(field);
+    },
+    getFieldError(field) {
+      var profile = this.profileForm;
+      var normalized;
+
+      switch (field) {
+        case 'name':
+          return profile.name && profile.name.trim() ? '' : 'Toto pole je povinné.';
+        case 'owner':
+          return profile.owner && profile.owner.trim() ? '' : 'Toto pole je povinné.';
+        case 'email':
+          normalized = (profile.email || '').trim();
+          if (!normalized) return 'Email je povinný.';
+          return EMAIL_REGEX.test(normalized) ? '' : 'Zadajte platný email.';
+        case 'phone':
+          normalized = (profile.phone || '').trim();
+          if (!normalized) return 'Telefón je povinný.';
+          return PHONE_REGEX.test(normalized.replace(/\s+/g, ''))
+            ? ''
+            : 'Telefón musí obsahovať 8 až 14 číslic (môže mať medzery a znak + na začiatku).';
+        case 'restaurantType':
+          return profile.restaurantType ? '' : 'Toto pole je povinné.';
+        case 'otherRestaurantType':
+          return profile.restaurantType === 'Ostatné' && !(profile.otherRestaurantType || '').trim()
+            ? 'Uveďte vlastný typ reštaurácie.'
+            : '';
+        case 'cuisine':
+          return profile.cuisine ? '' : 'Toto pole je povinné.';
+        case 'otherCuisine':
+          return profile.cuisine === 'Ostatné' && !(profile.otherCuisine || '').trim()
+            ? 'Uveďte vlastný typ kuchyne.'
+            : '';
+        case 'addressStreet':
+          return profile.address && (profile.address.street || '').trim() ? '' : 'Toto pole je povinné.';
+        case 'addressCity':
+          return profile.address && (profile.address.city || '').trim() ? '' : 'Toto pole je povinné.';
+        case 'addressZip':
+          normalized = profile.address ? (profile.address.zip || '').trim() : '';
+          if (!normalized) return 'PSČ je povinné.';
+          return ZIP_REGEX.test(normalized) ? '' : 'Zadajte platné PSČ.';
+        case 'seats':
+          normalized = profile.seats;
+          if (normalized === '' || normalized === null || normalized === undefined) return '';
+          return Number(normalized) >= 0 ? '' : 'Zadajte kladné číslo.';
+        case 'companyName':
+          return profile.billToCompany && !(profile.company?.name || '').trim() ? 'Zadajte názov firmy.' : '';
+        case 'companyIco':
+          return profile.billToCompany && !(profile.company?.ico || '').trim() ? 'IČO je povinné.' : '';
+        case 'companyDic':
+          return profile.billToCompany && !(profile.company?.dic || '').trim() ? 'DIČ je povinné.' : '';
+        case 'companyIcDph':
+          return '';
+        case 'billingEmail':
+          normalized = profile.billing ? (profile.billing.email || '').trim() : '';
+          if (!normalized) return '';
+          return EMAIL_REGEX.test(normalized) ? '' : 'Zadajte platný email.';
+        case 'billingZip':
+          normalized = profile.billing ? (profile.billing.zip || '').trim() : '';
+          if (!normalized) return '';
+          return ZIP_REGEX.test(normalized) ? '' : 'Zadajte platné PSČ.';
+        default:
+          return '';
+      }
+    },
+    validateFields(fields) {
+      var valid = true;
+      fields.forEach((field) => {
+        var message = this.getFieldError(field);
+        if (field in this.errors) {
+          this.errors[field] = message;
+        }
+        if (message) valid = false;
+      });
+      return valid;
+    },
+    validateProfile() {
+      return this.validateFields([
+        'name',
+        'owner',
+        'email',
+        'phone',
+        'restaurantType',
+        'otherRestaurantType',
+        'cuisine',
+        'otherCuisine',
+        'addressStreet',
+        'addressCity',
+        'addressZip',
+        'seats',
+        'companyName',
+        'companyIco',
+        'companyDic',
+        'companyIcDph',
+        'billingEmail',
+        'billingZip',
+      ]);
     },
     changePassword() {
       this.snackbar.notify({ message: 'Odoslaný odkaz na zmenu hesla.', variant: 'info' });
@@ -601,11 +932,12 @@ export default {
         variant: 'success',
       });
     },
-    handleTemporaryToggle(value) {
-      if (value) {
-        this.temporaryClosure = false;
+    handleTemporaryToggle(isOpen) {
+      if (!isOpen) {
         this.pauseModalVisible = true;
+        return;
       }
+      this.setTemporaryClosure(false);
     },
     cancelPause() {
       this.pauseModalVisible = false;
@@ -613,12 +945,21 @@ export default {
     },
     confirmPause() {
       this.pauseModalVisible = false;
-      this.temporaryClosure = true;
-      this.snackbar.notify({ message: 'Prevádzka je dočasne zatvorená.', variant: 'info' });
+      this.setTemporaryClosure(true);
     },
-    confirmDeactivate() {
+    async setTemporaryClosure(value) {
+      var res = await this.$store.dispatch('settings/setTemporaryClosure', { closed: value });
+      if (res && typeof res.temporaryClosed === 'boolean') {
+        this.temporaryClosure = !!res.temporaryClosed;
+        return;
+      }
+      this.temporaryClosure = false;
+    },
+    async confirmDeactivate() {
+      var ok = await this.$store.dispatch('settings/setAccountStatus', { active: !this.accountActive });
+      if (!ok) return;
       this.deactivateModalVisible = false;
-      this.snackbar.notify({ message: 'Účet bol deaktivovaný.', variant: 'warning' });
+      this.accountActive = !this.accountActive;
     },
     openDeleteVerify() {
       this.deleteConfirmVisible = false;
@@ -630,7 +971,7 @@ export default {
       this.deleteVerifyVisible = false;
       this.deleteErrors = { restaurantName: '', password: '' };
     },
-    finalizeDelete() {
+    async finalizeDelete() {
       this.deleteErrors = { restaurantName: '', password: '' };
       if (this.deleteForm.restaurantName.trim() !== this.profileForm.name.trim()) {
         this.deleteErrors.restaurantName = 'Názov reštaurácie sa nezhoduje.';
@@ -639,8 +980,17 @@ export default {
         this.deleteErrors.password = 'Zadajte heslo.';
       }
       if (this.deleteErrors.restaurantName || this.deleteErrors.password) return;
+
+      var ok = await this.$store.dispatch('settings/deleteAccount', {
+        restaurantName: this.deleteForm.restaurantName,
+        password: this.deleteForm.password,
+      });
+      if (!ok) return;
+
       this.deleteVerifyVisible = false;
-      this.snackbar.notify({ message: 'Všetky dáta boli odstránené.', variant: 'danger' });
+      this.$store.dispatch('user/odhlasenie', { silent: true }).finally(() => {
+        this.$router.push({ name: 'admin-login' });
+      });
     },
   },
 };

@@ -4,11 +4,14 @@ namespace Database\Seeders;
 
 use App\Models\Address;
 use App\Models\Restaurant;
+use App\Models\Restaurant_billing;
+use App\Models\Type_kitchen;
 use App\Models\Type_restaurant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
+//bola vygenerovana AI
 class RestaurantSeeder extends Seeder
 {
     /**
@@ -16,6 +19,9 @@ class RestaurantSeeder extends Seeder
      */
     public function run(): void
     {
+        Type_restaurant::query()->firstOrCreate(['type' => 'Ostatné']);
+        Type_kitchen::query()->firstOrCreate(['type' => 'Ostatné']);
+
         $restaurants = [
             [
                 'user' => [
@@ -37,6 +43,7 @@ class RestaurantSeeder extends Seeder
                     'city'               => 'Bratislava',
                 ],
                 'type' => 'Cafe',
+                'kitchens' => ['Slovenska', 'International'],
             ],
             [
                 'user' => [
@@ -58,6 +65,7 @@ class RestaurantSeeder extends Seeder
                     'city'               => 'Presov',
                 ],
                 'type' => 'Bistro',
+                'kitchens' => ['Slovenska'],
             ],
             [
                 'user' => [
@@ -79,6 +87,7 @@ class RestaurantSeeder extends Seeder
                     'city'               => 'Nitra',
                 ],
                 'type' => 'Restaurant',
+                'kitchens' => ['International'],
             ],
             [
                 'user' => [
@@ -92,6 +101,8 @@ class RestaurantSeeder extends Seeder
                     'description'     => 'Testovacia restauracia pre prihlasenie.',
                     'number_of_tables' => 10,
                     'is_active'       => true,
+                    'other_restaurant_type' => 'Vlastny typ',
+                    'other_type_kitchen' => 'Vlastna kuchyna',
                 ],
                 'address' => [
                     'street'             => 'Testovacia',
@@ -100,6 +111,22 @@ class RestaurantSeeder extends Seeder
                     'city'               => 'Zilina',
                 ],
                 'type' => 'Test',
+                'kitchens' => ['Slovenska'],
+                'billing' => [
+                    'company_name' => 'Test Restauracia s.r.o.',
+                    'ico' => '12345678',
+                    'dic' => '2012345678',
+                    'ic_dph' => 'SK2012345678',
+                    'iban' => 'SK991010051478454681561',
+                    'bill_to_company' => true,
+                    'billing_street' => 'Fakturacna 12',
+                    'billing_city' => 'Zilina',
+                    'billing_zip' => '01001',
+                    'billing_country' => 'Slovensko',
+                    'billing_email' => 'billing@test.sk',
+                    'subscription_status' => 'trialing',
+                    'trial_ends_at' => now()->addDays(14),
+                ],
             ],
         ];
 
@@ -118,19 +145,53 @@ class RestaurantSeeder extends Seeder
 
             $type = Type_restaurant::query()->firstOrCreate(['type' => $restaurantData['type']]);
 
-            Restaurant::query()->updateOrCreate(
+            $restaurant = Restaurant::query()->updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'is_active'          => $restaurantData['profile']['is_active'],
                     'name'               => $restaurantData['profile']['name'],
                     'name_boss'          => $restaurantData['profile']['name_boss'],
                     'type_restaurant_id' => $type->id,
+                    'other_restaurant_type' => $restaurantData['profile']['other_restaurant_type'] ?? null,
+                    'other_type_kitchen' => $restaurantData['profile']['other_type_kitchen'] ?? null,
                     'description'        => $restaurantData['profile']['description'],
                     'logo_path'          => null,
                     'address_id'         => $address->id,
                     'number_of_tables'   => $restaurantData['profile']['number_of_tables'],
                 ]
             );
+
+            if (! empty($restaurantData['kitchens'])) {
+                $kitchenIds = [];
+
+                foreach ($restaurantData['kitchens'] as $kitchenType) {
+                    $kitchenIds[] = Type_kitchen::query()->firstOrCreate(['type' => $kitchenType])->id;
+                }
+
+                $restaurant->kitchens()->sync($kitchenIds);
+            }
+
+            if (! empty($restaurantData['billing'])) {
+                $billing = $restaurantData['billing'];
+                Restaurant_billing::query()->updateOrCreate(
+                    ['restaurant_id' => $restaurant->id],
+                    [
+                        'company_name' => $billing['company_name'] ?? null,
+                        'ico' => $billing['ico'] ?? null,
+                        'dic' => $billing['dic'] ?? null,
+                        'ic_dph' => $billing['ic_dph'] ?? null,
+                        'iban' => $billing['iban'] ?? null,
+                        'bill_to_company' => $billing['bill_to_company'] ?? false,
+                        'billing_street' => $billing['billing_street'] ?? null,
+                        'billing_city' => $billing['billing_city'] ?? null,
+                        'billing_zip' => $billing['billing_zip'] ?? null,
+                        'billing_country' => $billing['billing_country'] ?? null,
+                        'billing_email' => $billing['billing_email'] ?? null,
+                        'subscription_status' => $billing['subscription_status'] ?? null,
+                        'trial_ends_at' => $billing['trial_ends_at'] ?? null,
+                    ]
+                );
+            }
         }
     }
 }

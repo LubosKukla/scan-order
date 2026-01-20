@@ -232,6 +232,13 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  if (to.name === 'restauracia-menu' && from.name !== 'restauracia-loading') {
+    return next({
+      name: 'restauracia-loading',
+      query: { next: to.fullPath },
+    });
+  }
+
   const requiresAdmin = to.matched.some((r) => r.meta && r.meta.requiresRole === 'admin');
   const isLoggedIn = store.getters['user/isLoggedIn'];
 

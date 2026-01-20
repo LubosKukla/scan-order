@@ -1,5 +1,7 @@
 const state = {
-  // TODO: add module-specific state
+  profile: null,
+  restaurantTypes: [],
+  cuisineTypes: [],
 };
 
 export default state;

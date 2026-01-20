@@ -58,7 +58,9 @@
       <BaseButton variant="secondary" type="button" class="flex-1 justify-center" @click="$emit('prev')">
         Späť
       </BaseButton>
-      <BaseButton type="submit" class="flex-1 justify-center">Dokončiť registráciu</BaseButton>
+      <BaseButton type="button" class="flex-1 justify-center" @click="handleSubmit">
+        Dokončiť registráciu
+      </BaseButton>
     </div>
   </form>
 </template>

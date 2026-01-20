@@ -18,11 +18,18 @@ class Restaurant_billing extends Model
         'iban',
         'trial_ends_at',
         'subscription_status',
-        'company_name'
+        'company_name',
+        'bill_to_company',
+        'billing_street',
+        'billing_city',
+        'billing_zip',
+        'billing_country',
+        'billing_email',
     ];
 
     protected $casts = [
         'trial_ends_at' => 'date',
+        'bill_to_company' => 'boolean',
     ];
 
     public function plan()

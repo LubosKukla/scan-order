@@ -77,6 +77,12 @@ Route::middleware(['auth:sanctum', 'restaurant', 'paid'])
 Route::middleware(['auth:sanctum', 'restaurant'])
     ->prefix('restaurants/{restaurant}')
     ->group(function () {
+        Route::get('/settings', [RestaurantController::class, 'getSettings']);
+        Route::put('/settings', [RestaurantController::class, 'updateSettings']);
+        Route::post('/temporary-close', [RestaurantController::class, 'setTemporaryClosure']);
+        Route::post('/deactivate', [RestaurantController::class, 'deactivateAccount']);
+        Route::post('/activate', [RestaurantController::class, 'activateAccount']);
+        Route::post('/delete', [RestaurantController::class, 'deleteAccount']);
         Route::get('/reviews', [RestaurantController::class, 'getReviews']);
         Route::get('/reviews/stats', [RestaurantController::class, 'getReviewStats']);
     });

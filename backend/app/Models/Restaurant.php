@@ -11,9 +11,12 @@ class Restaurant extends Model
 
     protected $fillable = [
         'is_active',
+        'is_temporarily_closed',
         'name',
         'name_boss',
         'type_restaurant_id',
+        'other_restaurant_type',
+        'other_type_kitchen',
         'description',
         'logo_path',
         'address_id',

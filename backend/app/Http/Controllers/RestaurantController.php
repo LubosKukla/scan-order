@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Restaurant;
 use App\Models\Review;
 use App\Models\Type_kitchen;
 use App\Models\Type_restaurant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Nette\Utils\Type;
 
 class RestaurantController extends Controller
@@ -45,13 +49,231 @@ class RestaurantController extends Controller
     public function getTypes()
     {
         $types = Type_restaurant::all();
+        if (! $types->firstWhere('type', 'Ostatné')) {
+            $types->push(new Type_restaurant(['type' => 'Ostatné']));
+        }
         return response()->json(['types' => $types]);
     }
 
     public function getKitchens()
     {
         $kitchens = Type_kitchen::all();
+        if (! $kitchens->firstWhere('type', 'Ostatné')) {
+            $kitchens->push(new Type_kitchen(['type' => 'Ostatné']));
+        }
         return response()->json(['kitchens' => $kitchens]);
+    }
+
+    public function getSettings(Restaurant $restaurant)
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        if ($user->id !== $restaurant->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $restaurant->loadMissing([
+            'address',
+            'typeRestaurant',
+            'kitchens',
+            'restaurantBilling',
+            'user' => fn($query) => $query->select('id', 'email', 'phone'),
+        ]);
+
+        $address = $restaurant->address;
+        $billing = $restaurant->restaurantBilling;
+        $kitchen = $restaurant->kitchens->first();
+
+        $street = $address
+            ? trim($address->street . ' ' . $address->number_of_building)
+            : '';
+
+        return response()->json([
+            'profile' => [
+                'name' => $restaurant->name ?? '',
+                'owner' => $restaurant->name_boss ?? '',
+                'email' => optional($restaurant->user)->email ?? '',
+                'phone' => optional($restaurant->user)->phone ?? '',
+                'restaurantType' => $restaurant->other_restaurant_type
+                    ? 'Ostatné'
+                    : (optional($restaurant->typeRestaurant)->type ?? ''),
+                'otherRestaurantType' => $restaurant->other_restaurant_type ?? '',
+                'cuisine' => $restaurant->other_type_kitchen
+                    ? 'Ostatné'
+                    : (optional($kitchen)->type ?? ''),
+                'otherCuisine' => $restaurant->other_type_kitchen ?? '',
+                'description' => $restaurant->description ?? '',
+                'seats' => $restaurant->number_of_tables ?? 0,
+                'logo' => $restaurant->logo_path ?? '',
+                'isActive' => (bool) $restaurant->is_active,
+                'temporaryClosed' => (bool) $restaurant->is_temporarily_closed,
+                'address' => [
+                    'street' => $street,
+                    'city' => $address->city ?? '',
+                    'zip' => $address->PSC ?? '',
+                ],
+                'billToCompany' => $billing ? (bool) $billing->bill_to_company : false,
+                'company' => [
+                    'name' => optional($billing)->company_name ?? '',
+                    'ico' => optional($billing)->ico ?? '',
+                    'dic' => optional($billing)->dic ?? '',
+                    'icDph' => optional($billing)->ic_dph ?? '',
+                ],
+                'billing' => [
+                    'iban' => optional($billing)->iban ?? '',
+                    'street' => optional($billing)->billing_street ?? '',
+                    'city' => optional($billing)->billing_city ?? '',
+                    'zip' => optional($billing)->billing_zip ?? '',
+                    'country' => optional($billing)->billing_country ?? '',
+                    'email' => optional($billing)->billing_email ?? '',
+                ],
+            ],
+        ]);
+    }
+
+    public function updateSettings(Request $request, Restaurant $restaurant)
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        if ($user->id !== $restaurant->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => ['nullable', 'string', 'max:255'],
+            'owner' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'restaurantType' => ['nullable', 'string', 'max:255'],
+            'otherRestaurantType' => ['nullable', 'string', 'max:255'],
+            'cuisine' => ['nullable', 'string', 'max:255'],
+            'otherCuisine' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'seats' => ['nullable', 'integer', 'min:0'],
+            'logo' => ['nullable', 'string', 'max:255'],
+            'billToCompany' => ['nullable', 'boolean'],
+            'company.name' => ['nullable', 'string', 'max:255'],
+            'company.ico' => ['nullable', 'string', 'max:50'],
+            'company.dic' => ['nullable', 'string', 'max:50'],
+            'company.icDph' => ['nullable', 'string', 'max:50'],
+            'billing.iban' => ['nullable', 'string', 'max:50'],
+            'billing.street' => ['nullable', 'string', 'max:255'],
+            'billing.city' => ['nullable', 'string', 'max:255'],
+            'billing.zip' => ['nullable', 'string', 'max:20'],
+            'billing.country' => ['nullable', 'string', 'max:255'],
+            'billing.email' => ['nullable', 'email', 'max:255'],
+            'address.street' => ['nullable', 'string', 'max:255'],
+            'address.city' => ['nullable', 'string', 'max:255'],
+            'address.zip' => ['nullable', 'string', 'max:20'],
+        ], [
+            'email.email' => 'Zadajte platný email.',
+            'email.unique' => 'Tento email už používa iný účet.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], 422);
+        }
+
+        $data = $validator->validated();
+
+        $restaurantType = $data['restaurantType'] ?? null;
+        if ($restaurantType) {
+            if ($restaurantType === 'Ostatné') {
+                $type = Type_restaurant::query()->firstOrCreate(['type' => 'Ostatné']);
+                $restaurant->type_restaurant_id = $type->id;
+                $restaurant->other_restaurant_type = $data['otherRestaurantType'] ?? null;
+            } else {
+                $type = Type_restaurant::query()->firstOrCreate(['type' => $restaurantType]);
+                $restaurant->type_restaurant_id = $type->id;
+                $restaurant->other_restaurant_type = null;
+            }
+        }
+
+        $cuisine = $data['cuisine'] ?? null;
+        if ($cuisine) {
+            if ($cuisine === 'Ostatné') {
+                $kitchen = Type_kitchen::query()->firstOrCreate(['type' => 'Ostatné']);
+                $restaurant->other_type_kitchen = $data['otherCuisine'] ?? null;
+            } else {
+                $kitchen = Type_kitchen::query()->firstOrCreate(['type' => $cuisine]);
+                $restaurant->other_type_kitchen = null;
+            }
+
+            $restaurant->kitchens()->sync([$kitchen->id]);
+        }
+
+        $logo = $data['logo'] ?? null;
+        $restaurant->name = $data['name'] ?? $restaurant->name;
+        $restaurant->name_boss = $data['owner'] ?? $restaurant->name_boss;
+        $restaurant->description = $data['description'] ?? $restaurant->description;
+        $restaurant->number_of_tables = $data['seats'] ?? $restaurant->number_of_tables;
+        if (is_string($logo)) {
+            $restaurant->logo_path = $logo;
+        }
+
+        $restaurant->save();
+
+        if (! empty($data['email'])) {
+            $user->email = $data['email'];
+        }
+        $user->phone = $data['phone'] ?? null;
+        $user->save();
+
+        $addressData = $data['address'] ?? [];
+        $street = trim((string) ($addressData['street'] ?? ''));
+        $city = trim((string) ($addressData['city'] ?? ''));
+        $zip = trim((string) ($addressData['zip'] ?? ''));
+
+        if ($street !== '' || $city !== '' || $zip !== '' || $restaurant->address) {
+            $address = $restaurant->address ?: new Address();
+            $address->street = $street ?: null;
+            $address->number_of_building = null;
+            $address->PSC = $zip ?: null;
+            $address->city = $city ?: null;
+            $address->save();
+
+            $restaurant->address()->associate($address);
+            $restaurant->save();
+        }
+
+        $billToCompany = (bool) ($data['billToCompany'] ?? false);
+        $company = $data['company'] ?? [];
+        $billing = $data['billing'] ?? [];
+
+        $restaurant->restaurantBilling()->updateOrCreate(
+            ['restaurant_id' => $restaurant->id],
+            [
+                'company_name' => $billToCompany ? ($company['name'] ?? null) : null,
+                'ico' => $billToCompany ? ($company['ico'] ?? null) : null,
+                'dic' => $billToCompany ? ($company['dic'] ?? null) : null,
+                'ic_dph' => $billToCompany ? ($company['icDph'] ?? null) : null,
+                'iban' => $billing['iban'] ?? null,
+                'bill_to_company' => $billToCompany,
+                'billing_street' => $billing['street'] ?? null,
+                'billing_city' => $billing['city'] ?? null,
+                'billing_zip' => $billing['zip'] ?? null,
+                'billing_country' => $billing['country'] ?? null,
+                'billing_email' => $billing['email'] ?? null,
+            ]
+        );
+
+        $restaurant->refresh();
+
+        $response = $this->getSettings($restaurant);
+        if ($response->getStatusCode() !== 200) {
+            return $response;
+        }
+
+        $payload = $response->getData(true);
+        $payload['message'] = 'Nastavenia boli uložené.';
+
+        return response()->json($payload);
     }
 
     public function getPublicReviews(Restaurant $restaurant)
@@ -101,6 +323,100 @@ class RestaurantController extends Controller
             ->values();
 
         return response()->json(['reviews' => $reviews]);
+    }
+
+    public function setTemporaryClosure(Request $request, Restaurant $restaurant)
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        if ($user->id !== $restaurant->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $data = $request->validate([
+            'closed' => ['required', 'boolean'],
+        ], [
+            'closed.required' => 'Chýba hodnota zatvorenia.',
+        ]);
+
+        $restaurant->is_temporarily_closed = (bool) $data['closed'];
+        $restaurant->save();
+
+        return response()->json([
+            'message' => $restaurant->is_temporarily_closed
+                ? 'Prevádzka je dočasne zatvorená.'
+                : 'Prevádzka je otvorená.',
+            'temporaryClosed' => (bool) $restaurant->is_temporarily_closed,
+        ]);
+    }
+
+    public function deactivateAccount(Restaurant $restaurant)
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        if ($user->id !== $restaurant->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $restaurant->is_active = false;
+        $restaurant->save();
+
+        return response()->json(['message' => 'Účet bol deaktivovaný.']);
+    }
+
+    public function activateAccount(Restaurant $restaurant)
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        if ($user->id !== $restaurant->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $restaurant->is_active = true;
+        $restaurant->save();
+
+        return response()->json(['message' => 'Účet bol aktivovaný.']);
+    }
+
+    public function deleteAccount(Request $request, Restaurant $restaurant)
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        if ($user->id !== $restaurant->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $data = $request->validate([
+            'restaurant_name' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ], [
+            'restaurant_name.required' => 'Zadajte názov reštaurácie.',
+            'password.required' => 'Zadajte heslo.',
+        ]);
+
+        if (trim($data['restaurant_name']) !== trim((string) $restaurant->name)) {
+            return response()->json(['message' => 'Názov reštaurácie sa nezhoduje.'], 422);
+        }
+
+        if (! Hash::check($data['password'], $user->password)) {
+            return response()->json(['message' => 'Heslo nie je správne.'], 422);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'Účet bol trvalo odstránený.']);
     }
 
     public function getReviews(Request $request, Restaurant $restaurant)
@@ -161,6 +477,7 @@ class RestaurantController extends Controller
             'response_rate' => $total ? round(($responded / $total) * 100) : 0,
         ];
 
+        //pomohlo AI pre zabezúpečenie len požadovaných štatistík, ak sú zadané v query parametri 'only' defaultne vráti všetky
         $only = array_filter(array_map('trim', explode(',', (string) $request->query('only'))));
         if (! empty($only)) {
             $stats = array_intersect_key($stats, array_flip($only));
@@ -233,6 +550,8 @@ class RestaurantController extends Controller
         $search = trim((string) $request->query('search', ''));
         if ($search !== '') {
             $like = '%' . $search . '%';
+            //pokročile prehladavanie podla textu, zakaznika menu pomohla AI
+            //su to vnorene query ktore prehadaju tabulky reviews, customers a menu_items či sa text nenachádza v nich
             $query->where(function ($subQuery) use ($like) {
                 $subQuery->where('text', 'like', $like)
                     ->orWhereHas('customer', function ($customerQuery) use ($like) {

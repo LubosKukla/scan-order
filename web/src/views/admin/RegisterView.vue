@@ -294,17 +294,16 @@ export default {
         this.step = target;
       }
     },
-    finishRegistration() {
+    async finishRegistration() {
       if (!this.validateStepThree()) {
         this.notifyErrors('Vyberte si plán, aby ste mohli pokračovať.');
         return;
       }
 
-      snackbar.notify({
-        message: 'Registrácia bola úspešná.',
-        variant: 'success',
-      });
-      this.$emit('register-submit', { ...this.form });
+      const success = await this.$store.dispatch('user/registerRestaurant', { ...this.form });
+      if (success) {
+        this.$router.push('/admin/prehlad');
+      }
     },
   },
 };

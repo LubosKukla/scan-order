@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('type_restaurant_id')->nullable()->constrained('type_restaurants')->nullOnDelete();
             $table->boolean('is_active')->nullable();
+            $table->boolean('is_temporarily_closed')->default(false);
             $table->string('name')->nullable();
             $table->string('name_boss')->nullable();
             $table->string('description')->nullable();
